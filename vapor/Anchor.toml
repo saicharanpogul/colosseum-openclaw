@@ -1,0 +1,21 @@
+[toolchain]
+
+[features]
+seeds = false
+skip-lint = false
+
+[programs.devnet]
+vapor = "GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLwmuzqp5Dqkbd"
+
+[programs.localnet]
+vapor = "GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLwmuzqp5Dqkbd"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "devnet"
+wallet = "/Users/saicharan/.config/solana/id.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

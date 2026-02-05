@@ -1,0 +1,160 @@
+{
+  "version": "0.1.0",
+  "name": "vapor",
+  "instructions": [
+    {
+      "name": "createMarket",
+      "accounts": [
+        { "name": "authority", "isMut": true, "isSigner": true },
+        { "name": "market", "isMut": true, "isSigner": false },
+        { "name": "systemProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [
+        { "name": "projectId", "type": "u64" },
+        { "name": "projectName", "type": "string" },
+        { "name": "resolutionTimestamp", "type": "i64" },
+        { "name": "bump", "type": "u8" }
+      ]
+    },
+    {
+      "name": "buyShares",
+      "accounts": [
+        { "name": "user", "isMut": true, "isSigner": true },
+        { "name": "market", "isMut": true, "isSigner": false },
+        { "name": "position", "isMut": true, "isSigner": false },
+        { "name": "systemProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [
+        { "name": "side", "type": { "defined": "Side" } },
+        { "name": "amount", "type": "u64" },
+        { "name": "positionBump", "type": "u8" }
+      ]
+    },
+    {
+      "name": "resolveMarket",
+      "accounts": [
+        { "name": "authority", "isMut": true, "isSigner": true },
+        { "name": "market", "isMut": true, "isSigner": false }
+      ],
+      "args": [
+        { "name": "winner", "type": { "defined": "Side" } }
+      ]
+    },
+    {
+      "name": "claimWinnings",
+      "accounts": [
+        { "name": "user", "isMut": true, "isSigner": true },
+        { "name": "market", "isMut": false, "isSigner": false },
+        { "name": "position", "isMut": true, "isSigner": false }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Market",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "authority", "type": "publicKey" },
+          { "name": "projectId", "type": "u64" },
+          { "name": "projectName", "type": "string" },
+          { "name": "yesPool", "type": "u64" },
+          { "name": "noPool", "type": "u64" },
+          { "name": "totalVolume", "type": "u64" },
+          { "name": "status", "type": { "defined": "MarketStatus" } },
+          { "name": "resolution", "type": { "option": { "defined": "Side" } } },
+          { "name": "resolutionTimestamp", "type": "i64" },
+          { "name": "createdAt", "type": "i64" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    },
+    {
+      "name": "Position",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "owner", "type": "publicKey" },
+          { "name": "market", "type": "publicKey" },
+          { "name": "side", "type": { "defined": "Side" } },
+          { "name": "shares", "type": "u64" },
+          { "name": "avgPrice", "type": "u64" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "MarketStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Open" },
+          { "name": "Resolved" },
+          { "name": "Cancelled" }
+        ]
+      }
+    },
+    {
+      "name": "Side",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Yes" },
+          { "name": "No" }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "MarketCreated",
+      "fields": [
+        { "name": "market", "type": "publicKey", "index": false },
+        { "name": "projectId", "type": "u64", "index": false },
+        { "name": "authority", "type": "publicKey", "index": false }
+      ]
+    },
+    {
+      "name": "SharesBought",
+      "fields": [
+        { "name": "market", "type": "publicKey", "index": false },
+        { "name": "user", "type": "publicKey", "index": false },
+        { "name": "side", "type": { "defined": "Side" }, "index": false },
+        { "name": "amount", "type": "u64", "index": false },
+        { "name": "shares", "type": "u64", "index": false }
+      ]
+    },
+    {
+      "name": "MarketResolved",
+      "fields": [
+        { "name": "market", "type": "publicKey", "index": false },
+        { "name": "winner", "type": { "defined": "Side" }, "index": false }
+      ]
+    },
+    {
+      "name": "WinningsClaimed",
+      "fields": [
+        { "name": "market", "type": "publicKey", "index": false },
+        { "name": "user", "type": "publicKey", "index": false },
+        { "name": "payout", "type": "u64", "index": false }
+      ]
+    }
+  ],
+  "errors": [
+    { "code": 6000, "name": "NameTooLong", "msg": "Name exceeds 64 characters" },
+    { "code": 6001, "name": "InvalidAmount", "msg": "Amount must be greater than zero" },
+    { "code": 6002, "name": "MarketClosed", "msg": "Market is closed" },
+    { "code": 6003, "name": "MarketNotResolved", "msg": "Market not yet resolved" },
+    { "code": 6004, "name": "Overflow", "msg": "Arithmetic overflow" },
+    { "code": 6005, "name": "Unauthorized", "msg": "Unauthorized" },
+    { "code": 6006, "name": "WrongSide", "msg": "Position is on wrong side" },
+    { "code": 6007, "name": "NoPosition", "msg": "No position to claim" },
+    { "code": 6008, "name": "PositionLost", "msg": "Position did not win" }
+  ],
+  "metadata": {
+    "address": "GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLwmuzqp5Dqkbd"
+  }
+}
