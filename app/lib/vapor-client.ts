@@ -10,21 +10,53 @@ import {
   clusterApiUrl,
   LAMPORTS_PER_SOL,
 } from '@solana/web3.js';
+import { Buffer } from 'buffer';
 
-// Simple BigInt to LE Buffer helper (replaces bn.js)
-function numberToLeBuffer(num: number | bigint, length: number): Buffer {
-  const buf = Buffer.alloc(length);
+// Helper: Convert Uint8Array to Buffer for Solana SDK compatibility
+function toBuffer(arr: Uint8Array): Buffer {
+  return Buffer.from(arr);
+}
+
+// Helper: Convert string to Uint8Array
+function stringToBytes(str: string): Uint8Array {
+  return new TextEncoder().encode(str);
+}
+
+// Helper: Concat Uint8Arrays
+function concatBytes(...arrays: Uint8Array[]): Uint8Array {
+  const totalLength = arrays.reduce((sum, arr) => sum + arr.length, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const arr of arrays) {
+    result.set(arr, offset);
+    offset += arr.length;
+  }
+  return result;
+}
+
+// Simple BigInt to LE Uint8Array helper
+function numberToLeBytes(num: number | bigint, length: number): Uint8Array {
+  const arr = new Uint8Array(length);
   const bigNum = BigInt(num);
   for (let i = 0; i < length; i++) {
-    buf[i] = Number((bigNum >> BigInt(8 * i)) & BigInt(0xff));
+    arr[i] = Number((bigNum >> BigInt(8 * i)) & BigInt(0xff));
   }
-  return buf;
+  return arr;
+}
+
+// Read LE u64 from Uint8Array (browser-safe)
+function readU64LE(data: Uint8Array, offset: number): number {
+  let value = BigInt(0);
+  for (let i = 0; i < 8; i++) {
+    value += BigInt(data[offset + i]) << BigInt(8 * i);
+  }
+  return Number(value);
 }
 
 // Program constants
 export const VAPOR_PROGRAM_ID = new PublicKey('GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLwmuzqp5Dqkbd');
-export const MARKET_SEED = Buffer.from('vapor-market');
-export const POSITION_SEED = Buffer.from('vapor-position');
+export const MARKET_SEED = stringToBytes('vapor-market');
+export const POSITION_SEED = stringToBytes('vapor-position');
 
 // Get RPC endpoint - prefer Helius if configured
 function getRpcEndpoint(): string {
@@ -48,8 +80,7 @@ export enum Side {
 
 // Derive market PDA
 export function deriveMarketPDA(projectId: number): [PublicKey, number] {
-  const projectIdBuffer = Buffer.alloc(8);
-  projectIdBuffer.writeBigUInt64LE(BigInt(projectId));
+  const projectIdBuffer = numberToLeBytes(projectId, 8);
   
   return PublicKey.findProgramAddressSync(
     [MARKET_SEED, projectIdBuffer],
@@ -63,17 +94,17 @@ export function derivePositionPDA(
   userWallet: PublicKey
 ): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
-    [POSITION_SEED, marketPDA.toBuffer(), userWallet.toBuffer()],
+    [POSITION_SEED, marketPDA.toBytes(), userWallet.toBytes()],
     VAPOR_PROGRAM_ID
   );
 }
 
 // Instruction discriminators (first 8 bytes of SHA256 hash of instruction name)
 const DISCRIMINATORS = {
-  createMarket: Buffer.from([103, 226, 97, 235, 200, 188, 183, 149]),
-  buyShares: Buffer.from([153, 238, 44, 87, 109, 153, 106, 160]),
-  resolveMarket: Buffer.from([155, 23, 50, 152, 52, 192, 110, 144]),
-  claimWinnings: Buffer.from([156, 39, 166, 139, 213, 100, 219, 16]),
+  createMarket: new Uint8Array([103, 226, 97, 235, 200, 188, 183, 149]),
+  buyShares: new Uint8Array([153, 238, 44, 87, 109, 153, 106, 160]),
+  resolveMarket: new Uint8Array([155, 23, 50, 152, 52, 192, 110, 144]),
+  claimWinnings: new Uint8Array([156, 39, 166, 139, 213, 100, 219, 16]),
 };
 
 // Create market instruction
@@ -86,22 +117,21 @@ export function createMarketInstruction(
   bump: number
 ): TransactionInstruction {
   // Encode instruction data
-  const projectIdBuffer = numberToLeBuffer(projectId, 8);
-  const timestampBuffer = numberToLeBuffer(resolutionTimestamp, 8);
+  const projectIdBuffer = numberToLeBytes(projectId, 8);
+  const timestampBuffer = numberToLeBytes(resolutionTimestamp, 8);
   
   // String encoding: 4-byte length prefix + utf8 bytes
-  const nameBytes = Buffer.from(projectName, 'utf8');
-  const nameLen = Buffer.alloc(4);
-  nameLen.writeUInt32LE(nameBytes.length);
+  const nameBytes = stringToBytes(projectName);
+  const nameLen = numberToLeBytes(nameBytes.length, 4);
   
-  const data = Buffer.concat([
+  const data = concatBytes(
     DISCRIMINATORS.createMarket,
     projectIdBuffer,
     nameLen,
     nameBytes,
     timestampBuffer,
-    Buffer.from([bump]),
-  ]);
+    new Uint8Array([bump]),
+  );
 
   return new TransactionInstruction({
     keys: [
@@ -110,7 +140,7 @@ export function createMarketInstruction(
       { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
     ],
     programId: VAPOR_PROGRAM_ID,
-    data,
+    data: toBuffer(data),
   });
 }
 
@@ -123,14 +153,14 @@ export function buySharesInstruction(
   amount: number,
   positionBump: number
 ): TransactionInstruction {
-  const amountBuffer = numberToLeBuffer(amount, 8);
+  const amountBuffer = numberToLeBytes(amount, 8);
   
-  const data = Buffer.concat([
+  const data = concatBytes(
     DISCRIMINATORS.buyShares,
-    Buffer.from([side]),
+    new Uint8Array([side]),
     amountBuffer,
-    Buffer.from([positionBump]),
-  ]);
+    new Uint8Array([positionBump]),
+  );
 
   return new TransactionInstruction({
     keys: [
@@ -140,7 +170,7 @@ export function buySharesInstruction(
       { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
     ],
     programId: VAPOR_PROGRAM_ID,
-    data,
+    data: toBuffer(data),
   });
 }
 
@@ -150,10 +180,10 @@ export function resolveMarketInstruction(
   marketPDA: PublicKey,
   winner: Side
 ): TransactionInstruction {
-  const data = Buffer.concat([
+  const data = concatBytes(
     DISCRIMINATORS.resolveMarket,
-    Buffer.from([winner]),
-  ]);
+    new Uint8Array([winner]),
+  );
 
   return new TransactionInstruction({
     keys: [
@@ -161,7 +191,7 @@ export function resolveMarketInstruction(
       { pubkey: marketPDA, isSigner: false, isWritable: true },
     ],
     programId: VAPOR_PROGRAM_ID,
-    data,
+    data: toBuffer(data),
   });
 }
 
@@ -178,7 +208,7 @@ export function claimWinningsInstruction(
       { pubkey: positionPDA, isSigner: false, isWritable: true },
     ],
     programId: VAPOR_PROGRAM_ID,
-    data: DISCRIMINATORS.claimWinnings,
+    data: toBuffer(DISCRIMINATORS.claimWinnings),
   });
 }
 
@@ -195,7 +225,7 @@ export async function buildTransaction(
   }
   
   tx.feePayer = payer;
-  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+  const { blockhash } = await connection.getLatestBlockhash();
   tx.recentBlockhash = blockhash;
   
   return tx;
@@ -216,8 +246,6 @@ export async function getMarketAccount(projectId: number): Promise<{
       return { exists: false, address: marketPDA.toBase58() };
     }
     
-    // Parse market data (simplified)
-    // Full parsing would decode the entire struct
     return { 
       exists: true, 
       address: marketPDA.toBase58(),
@@ -254,11 +282,11 @@ export async function getPositionAccount(
     }
     
     // Parse position data (skip 8-byte discriminator)
-    const data = accountInfo.data;
+    const data = new Uint8Array(accountInfo.data);
     // owner: 32, market: 32, side: 1, shares: 8, avg_price: 8, bump: 1
     const side = data[8 + 32 + 32] as Side;
-    const shares = Number(data.readBigUInt64LE(8 + 32 + 32 + 1));
-    const avgPrice = Number(data.readBigUInt64LE(8 + 32 + 32 + 1 + 8));
+    const shares = readU64LE(data, 8 + 32 + 32 + 1);
+    const avgPrice = readU64LE(data, 8 + 32 + 32 + 1 + 8);
     
     return { 
       exists: shares > 0, 
