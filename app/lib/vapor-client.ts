@@ -58,21 +58,11 @@ export const VAPOR_PROGRAM_ID = new PublicKey('GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLw
 export const MARKET_SEED = stringToBytes('vapor-market');
 export const POSITION_SEED = stringToBytes('vapor-position');
 
-// Get RPC endpoint - prefer Helius if configured, fallback to public devnet
-function getRpcEndpoint(): string {
-  // Check for Helius key in browser environment
-  if (typeof window !== 'undefined' && typeof process !== 'undefined' && process.env) {
-    const heliusKey = process.env.NEXT_PUBLIC_HELIUS_API_KEY;
-    if (heliusKey && heliusKey !== 'your_helius_api_key_here' && heliusKey.length > 10) {
-      return `https://devnet.helius-rpc.com/?api-key=${heliusKey}`;
-    }
-  }
-  // Fallback to public devnet RPC
-  return 'https://api.devnet.solana.com';
-}
+// Devnet RPC endpoint
+const RPC_ENDPOINT = 'https://api.devnet.solana.com';
 
 // Devnet connection
-export const connection = new Connection(getRpcEndpoint(), 'confirmed');
+export const connection = new Connection(RPC_ENDPOINT, 'confirmed');
 
 // Side enum matching the program
 export enum Side {
