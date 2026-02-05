@@ -58,15 +58,17 @@ export const VAPOR_PROGRAM_ID = new PublicKey('GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLw
 export const MARKET_SEED = stringToBytes('vapor-market');
 export const POSITION_SEED = stringToBytes('vapor-position');
 
-// Get RPC endpoint - prefer Helius if configured
+// Get RPC endpoint - prefer Helius if configured, fallback to public devnet
 function getRpcEndpoint(): string {
-  if (typeof window !== 'undefined') {
+  // Check for Helius key in browser environment
+  if (typeof window !== 'undefined' && typeof process !== 'undefined' && process.env) {
     const heliusKey = process.env.NEXT_PUBLIC_HELIUS_API_KEY;
-    if (heliusKey) {
+    if (heliusKey && heliusKey !== 'your_helius_api_key_here' && heliusKey.length > 10) {
       return `https://devnet.helius-rpc.com/?api-key=${heliusKey}`;
     }
   }
-  return clusterApiUrl('devnet');
+  // Fallback to public devnet RPC
+  return 'https://api.devnet.solana.com';
 }
 
 // Devnet connection
