@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+:root {
+  --vapor-bg: #0a0a0f;
+  --vapor-surface: #12121a;
+  --vapor-border: #1e1e2e;
+  --vapor-accent: #6366f1;
+  --vapor-accent-glow: rgba(99, 102, 241, 0.3);
+  --vapor-green: #10b981;
+  --vapor-red: #ef4444;
+  --vapor-muted: #6b7280;
+  --vapor-text: #e5e7eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--vapor-bg);
+  color: var(--vapor-text);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Glow effects */
+.glow-accent {
+  box-shadow: 0 0 20px var(--vapor-accent-glow), 0 0 40px rgba(99, 102, 241, 0.1);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.glow-red {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card styling */
+.vapor-card {
+  background: var(--vapor-surface);
+  border: 1px solid var(--vapor-border);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.vapor-card:hover {
+  border-color: var(--vapor-accent);
+  box-shadow: 0 0 30px var(--vapor-accent-glow);
+}
+
+/* Progress bar for odds */
+.odds-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--vapor-border);
+  overflow: hidden;
+}
+
+.odds-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.odds-fill.yes {
+  background: linear-gradient(90deg, var(--vapor-green), #34d399);
+}
+
+.odds-fill.no {
+  background: linear-gradient(90deg, var(--vapor-red), #f87171);
+}
+
+/* Button styles */
+.vapor-button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.vapor-button-primary {
+  background: var(--vapor-accent);
+  color: white;
+}
+
+.vapor-button-primary:hover {
+  background: #818cf8;
+  box-shadow: 0 0 20px var(--vapor-accent-glow);
+}
+
+.vapor-button-outline {
+  background: transparent;
+  border: 1px solid var(--vapor-border);
+  color: var(--vapor-text);
+}
+
+.vapor-button-outline:hover {
+  border-color: var(--vapor-accent);
+  color: var(--vapor-accent);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--vapor-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vapor-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vapor-muted);
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
