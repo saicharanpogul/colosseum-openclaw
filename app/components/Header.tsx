@@ -3,6 +3,7 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useEffect, useState } from 'react';
+import { FaucetButton } from './FaucetButton';
 
 export function Header() {
   const { publicKey, connected, disconnect } = useWallet();
@@ -76,6 +77,7 @@ export function Header() {
             {mounted && (
               connected ? (
                 <div className="flex items-center gap-3">
+                  <FaucetButton />
                   {balance !== null && (
                     <div className="hidden sm:block text-sm text-[var(--vapor-muted)]">
                       <span className="text-[var(--vapor-accent)]">{balance.toFixed(2)}</span> SOL

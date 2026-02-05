@@ -26,8 +26,19 @@ export const VAPOR_PROGRAM_ID = new PublicKey('GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLw
 export const MARKET_SEED = Buffer.from('vapor-market');
 export const POSITION_SEED = Buffer.from('vapor-position');
 
+// Get RPC endpoint - prefer Helius if configured
+function getRpcEndpoint(): string {
+  if (typeof window !== 'undefined') {
+    const heliusKey = process.env.NEXT_PUBLIC_HELIUS_API_KEY;
+    if (heliusKey) {
+      return `https://devnet.helius-rpc.com/?api-key=${heliusKey}`;
+    }
+  }
+  return clusterApiUrl('devnet');
+}
+
 // Devnet connection
-export const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+export const connection = new Connection(getRpcEndpoint(), 'confirmed');
 
 // Side enum matching the program
 export enum Side {

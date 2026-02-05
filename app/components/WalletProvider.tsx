@@ -17,8 +17,14 @@ interface Props {
 }
 
 export const WalletContextProvider: FC<Props> = ({ children }) => {
-  // Use devnet for Vapor
-  const endpoint = useMemo(() => clusterApiUrl('devnet'), []);
+  // Use Helius RPC if available, fallback to public devnet
+  const endpoint = useMemo(() => {
+    const heliusKey = process.env.NEXT_PUBLIC_HELIUS_API_KEY;
+    if (heliusKey) {
+      return `https://devnet.helius-rpc.com/?api-key=${heliusKey}`;
+    }
+    return clusterApiUrl('devnet');
+  }, []);
   
   const wallets = useMemo(
     () => [
