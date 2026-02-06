@@ -67,7 +67,7 @@ export default function Home() {
           </h2>
           <p className="text-lg text-[var(--arena-text-dim)] max-w-2xl mx-auto mb-6">
             Prediction markets for Colosseum hackathon projects.
-            Trade on who will win. Collective belief becomes price.
+            Trade on who will win.
           </p>
           
           <div className="flex items-center justify-center gap-6 text-sm">

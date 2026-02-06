@@ -356,12 +356,14 @@ export function calculateOdds(yesPool: number, noPool: number): { yes: number; n
   };
 }
 
-// Format lamports to SOL
-export function lamportsToSol(lamports: number): number {
-  return lamports / LAMPORTS_PER_SOL;
+// Format program units to SOL (program uses micro-SOL: 1 SOL = 1_000_000 units)
+export const UNITS_PER_SOL = 1_000_000;
+
+export function lamportsToSol(units: number): number {
+  return units / UNITS_PER_SOL;
 }
 
-// Format SOL to lamports
+// Format SOL to program units
 export function solToLamports(sol: number): number {
-  return Math.floor(sol * LAMPORTS_PER_SOL);
+  return Math.floor(sol * UNITS_PER_SOL);
 }

@@ -137,7 +137,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
     const position = side === 'yes' ? positions.yes : positions.no;
     if (!position || loading || vaporLoading) return;
     
-    const sharesToSell = sellAmountNum > 0 ? Math.floor(sellAmountNum * 1e9) : position.shares;
+    const sharesToSell = sellAmountNum > 0 ? Math.floor(sellAmountNum * 1e6) : position.shares;
     if (sharesToSell <= 0 || sharesToSell > position.shares) {
       return;
     }
@@ -243,7 +243,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
           {positions.yes && (
             <div className="p-2 rounded-lg bg-[var(--vapor-green)]/10 border border-[var(--vapor-green)]/30 flex justify-between items-center">
               <span className="text-sm text-[var(--vapor-green)]">
-                YES: {(positions.yes.shares / 1e9).toFixed(4)} shares
+                YES: {(positions.yes.shares / 1e6).toFixed(4)} shares
               </span>
               <button
                 onClick={() => { setActiveTab('yes'); setMode('sell'); }}
@@ -256,7 +256,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
           {positions.no && (
             <div className="p-2 rounded-lg bg-[var(--vapor-red)]/10 border border-[var(--vapor-red)]/30 flex justify-between items-center">
               <span className="text-sm text-[var(--vapor-red)]">
-                NO: {(positions.no.shares / 1e9).toFixed(4)} shares
+                NO: {(positions.no.shares / 1e6).toFixed(4)} shares
               </span>
               <button
                 onClick={() => { setActiveTab('no'); setMode('sell'); }}
