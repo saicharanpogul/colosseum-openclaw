@@ -173,8 +173,21 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
   const activePosition = activeTab === 'yes' ? positions.yes : positions.no;
   const hasAnyPosition = positions.yes || positions.no;
   
+  // Check if this is the Vapor project (our own)
+  const isVaporProject = market.projectId === 341 || market.projectName.toLowerCase() === 'vapor';
+  
+  // Format volume in SOL
+  const volumeInSol = (market.totalVolume / 1_000_000).toFixed(2);
+  
   return (
-    <div className="vapor-card p-6">
+    <div className={`vapor-card p-6 ${isVaporProject ? 'ring-2 ring-[var(--vapor-accent)] relative' : ''}`}>
+      {/* Vapor Badge */}
+      {isVaporProject && (
+        <div className="absolute -top-2 -right-2 px-2 py-1 bg-[var(--vapor-accent)] text-black text-xs font-bold rounded-full">
+          💨 OUR PROJECT
+        </div>
+      )}
+      
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
@@ -259,18 +272,23 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
       {/* Stats */}
       <div className="flex items-center justify-between text-sm mb-4">
         <div className="text-[var(--vapor-muted)]">
-          Vol: <span className="text-white">{market.totalVolume.toLocaleString()}</span>
+          Vol: <span className="text-white">{volumeInSol} SOL</span>
         </div>
-        {market.marketAddress && (
-          <a 
-            href={`https://explorer.solana.com/address/${market.marketAddress}?cluster=devnet`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[var(--vapor-accent)] text-xs font-mono hover:underline"
-          >
-            {market.marketAddress.slice(0, 4)}...{market.marketAddress.slice(-4)}
-          </a>
-        )}
+        <div className="flex items-center gap-3">
+          <div className="text-[var(--vapor-muted)]">
+            <span className="text-white">{market.participants || 0}</span> traders
+          </div>
+          {market.marketAddress && (
+            <a 
+              href={`https://explorer.solana.com/address/${market.marketAddress}?cluster=devnet`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--vapor-accent)] text-xs font-mono hover:underline"
+            >
+              {market.marketAddress.slice(0, 4)}...{market.marketAddress.slice(-4)}
+            </a>
+          )}
+        </div>
       </div>
       
       {/* Error Display */}

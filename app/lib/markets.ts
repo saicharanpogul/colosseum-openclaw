@@ -64,6 +64,7 @@ export function createMarketFromProject(project: ColosseumProject): Market {
     createdAt: new Date().toISOString(),
     marketAddress: marketPDA.toBase58(),
     upvotes,
+    participants: 0,
   };
   
   store.markets.set(id, market);
