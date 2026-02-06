@@ -91,12 +91,12 @@ export function derivePositionPDA(
   );
 }
 
-// Instruction discriminators (first 8 bytes of SHA256 hash of instruction name)
+// Instruction discriminators (sha256("global:<instruction_name>")[0..8])
 const DISCRIMINATORS = {
-  createMarket: new Uint8Array([103, 226, 97, 235, 200, 188, 183, 149]),
-  buyShares: new Uint8Array([153, 238, 44, 87, 109, 153, 106, 160]),
-  resolveMarket: new Uint8Array([155, 23, 50, 152, 52, 192, 110, 144]),
-  claimWinnings: new Uint8Array([156, 39, 166, 139, 213, 100, 219, 16]),
+  createMarket: new Uint8Array([103, 226, 97, 235, 200, 188, 251, 254]),
+  buyShares: new Uint8Array([40, 239, 138, 154, 8, 37, 106, 108]),
+  resolveMarket: new Uint8Array([155, 23, 80, 173, 46, 74, 23, 239]),
+  claimWinnings: new Uint8Array([161, 215, 24, 59, 14, 236, 242, 221]),
 };
 
 // Create market instruction
