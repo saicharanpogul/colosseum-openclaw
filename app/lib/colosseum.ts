@@ -1,7 +1,6 @@
 // Colosseum API client
 
 const COLOSSEUM_API = 'https://agents.colosseum.com/api';
-const PAGE_SIZE = 20;
 
 export async function fetchProjects(includeDrafts = false): Promise<any[]> {
   const allProjects: any[] = [];
@@ -24,17 +23,16 @@ export async function fetchProjects(includeDrafts = false): Promise<any[]> {
       const data = await res.json();
       const projects = data.projects || [];
       
-      if (projects.length === 0) {
-        hasMore = false;
-      } else {
-        allProjects.push(...projects);
-        page++;
-        
-        // Safety limit
-        if (page > 50) {
-          console.warn('Hit page limit, stopping');
-          break;
-        }
+      allProjects.push(...projects);
+      
+      // Use the hasMore flag from API
+      hasMore = data.hasMore === true;
+      page++;
+      
+      // Safety limit
+      if (page > 100) {
+        console.warn('Hit page limit (100), stopping');
+        break;
       }
     } catch (error) {
       console.error(`Error fetching page ${page}:`, error);
