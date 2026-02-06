@@ -15,7 +15,7 @@ export default function Home() {
   const stats: VaporStats = {
     totalMarkets: markets.length,
     activeMarkets: markets.filter(m => m.status === 'open').length,
-    resolvedMarkets: markets.filter(m => m.status === 'resolved').length,
+    totalTraders: markets.reduce((sum, m) => sum + (m.participants || 0), 0),
     totalVolume: markets.reduce((sum, m) => sum + m.totalVolume, 0),
   };
 
@@ -136,7 +136,7 @@ export default function Home() {
             </a>
             <span className="text-[var(--arena-border)]">•</span>
             <a 
-              href="https://explorer.solana.com/address/GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLwmuzqp5Dqkbd?cluster=devnet"
+              href="https://explorer.solana.com/address/51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P?cluster=devnet"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-[var(--arena-muted)] hover:text-[var(--arena-gold)] transition-colors"

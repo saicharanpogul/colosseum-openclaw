@@ -43,7 +43,7 @@ export function Header() {
     };
 
     fetchBalance();
-    const interval = setInterval(fetchBalance, 30000);
+    const interval = setInterval(fetchBalance, 5000); // Update every 5 seconds for real-time feel
     return () => clearInterval(interval);
   }, [connected, publicKey]);
 

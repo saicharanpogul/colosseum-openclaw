@@ -36,6 +36,8 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
   const [showTxLink, setShowTxLink] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'yes' | 'no'>('yes');
   const [mode, setMode] = useState<'buy' | 'sell'>('buy');
+  const [showDeployModal, setShowDeployModal] = useState(false);
+  const [deploying, setDeploying] = useState(false);
   
   const isResolved = market.status === 'resolved';
   const amountNum = parseFloat(amount) || 0;
@@ -182,6 +184,35 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
     }
   };
   
+  // Deploy market on-chain (anyone can call this crank)
+  const handleDeployMarket = async () => {
+    if (!connected) {
+      setVisible(true);
+      return;
+    }
+    
+    setDeploying(true);
+    clearError();
+    
+    try {
+      const sig = await createMarket(market.projectId, market.projectName, 7);
+      
+      if (sig) {
+        setMarketOnChain(true);
+        setShowDeployModal(false);
+        setShowTxLink(sig);
+        setTimeout(() => setShowTxLink(null), 10000);
+      }
+    } catch (error) {
+      console.error('Failed to deploy market:', error);
+    } finally {
+      setDeploying(false);
+    }
+  };
+  
+  // Colosseum project link
+  const colosseumLink = `https://colosseum.com/agent-hackathon/projects/${market.projectSlug || market.projectName.toLowerCase().replace(/\s+/g, '-')}`;
+  
   // Calculate estimated shares
   const estimatedShares = amountNum > 0 
     ? estimateTrade(market.yesPool, market.noPool, amountNum, activeTab)
@@ -209,16 +240,24 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
       )}
       
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-white mb-1">
             {market.projectName}
           </h3>
-          <p className="text-sm text-[var(--vapor-muted)]">
-            {market.question}
-          </p>
         </div>
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex items-center gap-2">
+          <a
+            href={colosseumLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1 rounded hover:bg-[var(--arena-surface-alt)] transition-colors"
+            title="View on Colosseum"
+          >
+            <svg className="w-4 h-4 text-[var(--arena-muted)] hover:text-[var(--arena-gold)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
           <div className={`px-3 py-1 rounded-full text-xs font-medium ${
             isResolved 
               ? 'bg-[var(--vapor-accent)]/20 text-[var(--vapor-accent)]' 
@@ -226,13 +265,84 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
           }`}>
             {isResolved ? 'Resolved' : 'Open'}
           </div>
-          {marketOnChain !== null && (
-            <div className={`text-xs ${marketOnChain ? 'text-[var(--vapor-green)]' : 'text-[var(--vapor-muted)]'}`}>
-              {marketOnChain ? '● On-chain' : '○ Not deployed'}
-            </div>
-          )}
         </div>
       </div>
+      
+      {/* Question */}
+      <p className="text-sm text-[var(--vapor-muted)] mb-3">
+        {market.question}
+      </p>
+      
+      {/* Deployment Status - Highlighted */}
+      {marketOnChain !== null && (
+        <div 
+          className={`mb-4 p-3 rounded-lg flex items-center justify-between ${
+            marketOnChain 
+              ? 'bg-[var(--arena-green)]/10 border border-[var(--arena-green)]/30' 
+              : 'bg-[var(--arena-gold)]/10 border border-[var(--arena-gold)]/30 cursor-pointer hover:bg-[var(--arena-gold)]/20'
+          }`}
+          onClick={() => !marketOnChain && setShowDeployModal(true)}
+        >
+          <div className="flex items-center gap-2">
+            <span className={`text-lg ${marketOnChain ? 'text-[var(--arena-green)]' : 'text-[var(--arena-gold)]'}`}>
+              {marketOnChain ? '✓' : '○'}
+            </span>
+            <span className={`text-sm font-medium ${marketOnChain ? 'text-[var(--arena-green)]' : 'text-[var(--arena-gold)]'}`}>
+              {marketOnChain ? 'Deployed On-Chain' : 'Not Deployed Yet'}
+            </span>
+          </div>
+          {!marketOnChain && (
+            <button className="text-xs px-3 py-1 rounded bg-[var(--arena-gold)] text-black font-medium hover:opacity-90">
+              Deploy Now
+            </button>
+          )}
+        </div>
+      )}
+      
+      {/* Deploy Modal */}
+      {showDeployModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setShowDeployModal(false)}>
+          <div className="vapor-card p-6 max-w-md w-full" onClick={e => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-white mb-4">Deploy Market On-Chain</h3>
+            <p className="text-[var(--arena-muted)] mb-4">
+              This market exists in the database but hasn't been deployed to Solana yet. 
+              Anyone can deploy it as a "crank" to initialize the on-chain state.
+            </p>
+            <div className="bg-[var(--arena-surface-alt)] rounded-lg p-4 mb-4">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-[var(--arena-muted)]">Project:</span>
+                <span className="text-white">{market.projectName}</span>
+              </div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-[var(--arena-muted)]">Initial Pools:</span>
+                <span className="text-white">1 SOL each</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-[var(--arena-muted)]">Starting Odds:</span>
+                <span className="text-white">50% / 50%</span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setShowDeployModal(false)}
+                className="flex-1 vapor-button vapor-button-outline"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDeployMarket}
+                disabled={deploying}
+                className="flex-1 vapor-button vapor-button-primary disabled:opacity-50"
+              >
+                {deploying ? 'Deploying...' : 'Deploy Market'}
+              </button>
+            </div>
+            {vaporError && (
+              <p className="text-[var(--arena-red)] text-sm mt-3">{vaporError}</p>
+            )}
+          </div>
+        </div>
+      )}
       
       {/* Price Chart */}
       <div className="mb-4">

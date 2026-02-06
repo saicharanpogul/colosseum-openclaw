@@ -30,10 +30,10 @@ export function StatsBar({ stats }: StatsBarProps) {
         </div>
         <div className="text-center">
           <div className="text-3xl font-bold text-[var(--arena-gold)]">
-            {stats.resolvedMarkets}
+            {stats.totalTraders}
           </div>
           <div className="text-sm text-[var(--arena-muted)] mt-1">
-            Resolved
+            Traders
           </div>
         </div>
         <div className="text-center">

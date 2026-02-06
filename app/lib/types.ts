@@ -56,5 +56,5 @@ export interface VaporStats {
   totalMarkets: number;
   totalVolume: number;
   activeMarkets: number;
-  resolvedMarkets: number;
+  totalTraders: number;
 }
