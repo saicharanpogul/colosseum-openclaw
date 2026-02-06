@@ -46,6 +46,9 @@ export function createMarketFromProject(project: ColosseumProject): Market {
   // Initial liquidity
   const initialLiquidity = 1000;
   
+  // Combined upvotes for sorting
+  const upvotes = (project.humanUpvotes || 0) + (project.agentUpvotes || 0);
+  
   const market: Market = {
     id,
     projectId: project.id,
@@ -60,6 +63,7 @@ export function createMarketFromProject(project: ColosseumProject): Market {
     status: 'open',
     createdAt: new Date().toISOString(),
     marketAddress: marketPDA.toBase58(),
+    upvotes,
   };
   
   store.markets.set(id, market);
@@ -72,8 +76,11 @@ export function getMarket(id: string): Market | undefined {
 
 export function getAllMarkets(): Market[] {
   return Array.from(store.markets.values()).sort((a, b) => {
-    // Sort by total volume descending
-    return b.totalVolume - a.totalVolume || b.yesOdds - a.yesOdds;
+    // Sort by total volume descending, then by upvotes
+    if (b.totalVolume !== a.totalVolume) {
+      return b.totalVolume - a.totalVolume;
+    }
+    return (b.upvotes || 0) - (a.upvotes || 0);
   });
 }
 

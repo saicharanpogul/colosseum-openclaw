@@ -40,6 +40,7 @@ export interface Market {
   resolvedAt?: string;
   marketAddress?: string; // Solana PDA
   priceHistory?: { timestamp: number; yesPrice: number; noPrice: number }[];
+  upvotes?: number; // Combined human + agent upvotes for sorting
 }
 
 export interface MarketPosition {
