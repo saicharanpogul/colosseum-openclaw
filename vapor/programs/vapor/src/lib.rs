@@ -98,6 +98,52 @@ pub mod vapor {
         Ok(())
     }
 
+    /// Sell shares back to the market
+    pub fn sell_shares(
+        ctx: Context<SellShares>,
+        side: Side,
+        shares_to_sell: u64,
+        _position_bump: u8,
+    ) -> Result<()> {
+        require!(shares_to_sell > 0, VaporError::InvalidAmount);
+        
+        let market = &mut ctx.accounts.market;
+        require!(market.status == MarketStatus::Open, VaporError::MarketClosed);
+        
+        let position = &mut ctx.accounts.position;
+        require!(position.shares >= shares_to_sell, VaporError::InsufficientShares);
+        
+        // Calculate payout using reverse CPMM
+        // When selling YES shares: add shares to yes_pool, remove from no_pool
+        let payout = match side {
+            Side::Yes => {
+                let payout = calculate_sell_payout(market.yes_pool, market.no_pool, shares_to_sell);
+                market.yes_pool = market.yes_pool.checked_add(shares_to_sell).ok_or(VaporError::Overflow)?;
+                market.no_pool = market.no_pool.checked_sub(payout).ok_or(VaporError::Overflow)?;
+                payout
+            }
+            Side::No => {
+                let payout = calculate_sell_payout(market.no_pool, market.yes_pool, shares_to_sell);
+                market.no_pool = market.no_pool.checked_add(shares_to_sell).ok_or(VaporError::Overflow)?;
+                market.yes_pool = market.yes_pool.checked_sub(payout).ok_or(VaporError::Overflow)?;
+                payout
+            }
+        };
+        
+        // Reduce position
+        position.shares = position.shares.checked_sub(shares_to_sell).ok_or(VaporError::Overflow)?;
+        
+        emit!(SharesSold {
+            market: market.key(),
+            user: ctx.accounts.user.key(),
+            side,
+            shares: shares_to_sell,
+            payout,
+        });
+        
+        Ok(())
+    }
+
     /// Resolve a market (authority only)
     pub fn resolve_market(
         ctx: Context<ResolveMarket>,
@@ -162,6 +208,14 @@ fn calculate_shares(pool: u64, opposite_pool: u64, amount: u64) -> u64 {
     let new_opposite = (opposite_pool as u128).checked_add(amount as u128).unwrap_or(u128::MAX);
     let new_pool = k.checked_div(new_opposite).unwrap_or(0);
     pool.saturating_sub(new_pool as u64)
+}
+
+fn calculate_sell_payout(pool: u64, opposite_pool: u64, shares: u64) -> u64 {
+    // Reverse CPMM: payout = opposite_pool - (pool * opposite_pool) / (pool + shares)
+    let k = (pool as u128).checked_mul(opposite_pool as u128).unwrap_or(0);
+    let new_pool = (pool as u128).checked_add(shares as u128).unwrap_or(u128::MAX);
+    let new_opposite = k.checked_div(new_pool).unwrap_or(0);
+    opposite_pool.saturating_sub(new_opposite as u64)
 }
 
 fn calculate_price(amount: u64, shares: u64) -> u64 {
@@ -280,6 +334,23 @@ pub struct BuyShares<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(side: Side, shares_to_sell: u64, position_bump: u8)]
+pub struct SellShares<'info> {
+    #[account(mut)]
+    pub user: Signer<'info>,
+    
+    #[account(mut)]
+    pub market: Account<'info, Market>,
+    
+    #[account(
+        mut,
+        seeds = [POSITION_SEED, market.key().as_ref(), user.key().as_ref(), &[side as u8]],
+        bump = position.bump
+    )]
+    pub position: Account<'info, Position>,
+}
+
+#[derive(Accounts)]
 pub struct ResolveMarket<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -323,6 +394,15 @@ pub struct SharesBought {
 }
 
 #[event]
+pub struct SharesSold {
+    pub market: Pubkey,
+    pub user: Pubkey,
+    pub side: Side,
+    pub shares: u64,
+    pub payout: u64,
+}
+
+#[event]
 pub struct MarketResolved {
     pub market: Pubkey,
     pub winner: Side,
@@ -357,4 +437,6 @@ pub enum VaporError {
     NoPosition,
     #[msg("Position did not win")]
     PositionLost,
+    #[msg("Insufficient shares to sell")]
+    InsufficientShares,
 }

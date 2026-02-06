@@ -20,6 +20,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
     error: vaporError, 
     txSignature,
     buyShares, 
+    sellShares,
     createMarket,
     checkMarketExists,
     getPositions,
@@ -29,13 +30,16 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
   
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState<string>('0.01');
+  const [sellAmount, setSellAmount] = useState<string>('');
   const [marketOnChain, setMarketOnChain] = useState<boolean | null>(null);
   const [positions, setPositions] = useState<{ yes: PositionData | null; no: PositionData | null }>({ yes: null, no: null });
   const [showTxLink, setShowTxLink] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'yes' | 'no'>('yes');
+  const [mode, setMode] = useState<'buy' | 'sell'>('buy');
   
   const isResolved = market.status === 'resolved';
   const amountNum = parseFloat(amount) || 0;
+  const sellAmountNum = parseFloat(sellAmount) || 0;
   
   // Check if market exists on-chain
   useEffect(() => {
@@ -123,6 +127,44 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
     }
   };
   
+  // Handle sell
+  const handleSell = async (side: 'yes' | 'no') => {
+    if (!connected) {
+      setVisible(true);
+      return;
+    }
+    
+    const position = side === 'yes' ? positions.yes : positions.no;
+    if (!position || loading || vaporLoading) return;
+    
+    const sharesToSell = sellAmountNum > 0 ? Math.floor(sellAmountNum * 1e9) : position.shares;
+    if (sharesToSell <= 0 || sharesToSell > position.shares) {
+      return;
+    }
+    
+    setLoading(true);
+    clearError();
+    
+    try {
+      const sig = await sellShares(market.projectId, side, sharesToSell);
+      
+      if (sig) {
+        setShowTxLink(sig);
+        setSellAmount('');
+        
+        // Refresh positions
+        const pos = await getPositions(market.projectId);
+        setPositions(pos);
+        
+        setTimeout(() => setShowTxLink(null), 10000);
+      }
+    } catch (error) {
+      console.error('Failed to sell shares:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   // Calculate estimated shares
   const estimatedShares = amountNum > 0 
     ? estimateTrade(market.yesPool, market.noPool, amountNum, activeTab)
@@ -159,7 +201,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
         </div>
       </div>
       
-            {/* Price Chart */}
+      {/* Price Chart */}
       <div className="mb-4">
         <PriceChart history={market.priceHistory || []} height={50} />
       </div>
@@ -190,6 +232,12 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
               <span className="text-sm text-[var(--vapor-green)]">
                 YES: {(positions.yes.shares / 1e9).toFixed(4)} shares
               </span>
+              <button
+                onClick={() => { setActiveTab('yes'); setMode('sell'); }}
+                className="text-xs px-2 py-1 rounded bg-[var(--vapor-green)]/20 text-[var(--vapor-green)] hover:bg-[var(--vapor-green)]/30"
+              >
+                Sell
+              </button>
             </div>
           )}
           {positions.no && (
@@ -197,6 +245,12 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
               <span className="text-sm text-[var(--vapor-red)]">
                 NO: {(positions.no.shares / 1e9).toFixed(4)} shares
               </span>
+              <button
+                onClick={() => { setActiveTab('no'); setMode('sell'); }}
+                className="text-xs px-2 py-1 rounded bg-[var(--vapor-red)]/20 text-[var(--vapor-red)] hover:bg-[var(--vapor-red)]/30"
+              >
+                Sell
+              </button>
             </div>
           )}
         </div>
@@ -246,76 +300,147 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
       {/* Trading Interface */}
       {!isResolved && (
         <div className="space-y-3">
-          {/* Tab Selector */}
+          {/* Mode Toggle */}
+          <div className="flex rounded-lg overflow-hidden border border-[var(--vapor-border)]">
+            <button
+              onClick={() => setMode('buy')}
+              className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                mode === 'buy'
+                  ? 'bg-[var(--vapor-accent)]/20 text-[var(--vapor-accent)]'
+                  : 'bg-transparent text-[var(--vapor-muted)] hover:bg-[var(--vapor-surface)]'
+              }`}
+            >
+              Buy
+            </button>
+            <button
+              onClick={() => setMode('sell')}
+              disabled={!hasAnyPosition}
+              className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                mode === 'sell'
+                  ? 'bg-[var(--vapor-accent)]/20 text-[var(--vapor-accent)]'
+                  : 'bg-transparent text-[var(--vapor-muted)] hover:bg-[var(--vapor-surface)]'
+              } ${!hasAnyPosition ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              Sell
+            </button>
+          </div>
+          
+          {/* Side Selector */}
           <div className="flex rounded-lg overflow-hidden border border-[var(--vapor-border)]">
             <button
               onClick={() => setActiveTab('yes')}
+              disabled={mode === 'sell' && !positions.yes}
               className={`flex-1 py-2 text-sm font-medium transition-colors ${
                 activeTab === 'yes'
                   ? 'bg-[var(--vapor-green)]/20 text-[var(--vapor-green)]'
                   : 'bg-transparent text-[var(--vapor-muted)] hover:bg-[var(--vapor-surface)]'
-              }`}
+              } ${mode === 'sell' && !positions.yes ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              Buy YES
+              YES
             </button>
             <button
               onClick={() => setActiveTab('no')}
+              disabled={mode === 'sell' && !positions.no}
               className={`flex-1 py-2 text-sm font-medium transition-colors ${
                 activeTab === 'no'
                   ? 'bg-[var(--vapor-red)]/20 text-[var(--vapor-red)]'
                   : 'bg-transparent text-[var(--vapor-muted)] hover:bg-[var(--vapor-surface)]'
-              }`}
+              } ${mode === 'sell' && !positions.no ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              Buy NO
+              NO
             </button>
           </div>
           
-          {/* Current Position for Tab */}
-          {activePosition && (
-            <p className="text-xs text-center text-[var(--vapor-muted)]">
-              You have {(activePosition.shares / 1e9).toFixed(4)} {activeTab.toUpperCase()} shares
-            </p>
+          {mode === 'buy' ? (
+            <>
+              {/* Amount Input */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="flex-1 bg-[var(--vapor-bg)] border border-[var(--vapor-border)] rounded-lg px-3 py-2 text-white text-sm focus:border-[var(--vapor-accent)] focus:outline-none"
+                  placeholder="Amount"
+                  min="0.001"
+                  step="0.01"
+                />
+                <span className="text-sm text-[var(--vapor-muted)]">SOL</span>
+              </div>
+              
+              {/* Estimate */}
+              {amountNum > 0 && (
+                <div className="text-xs text-[var(--vapor-muted)] text-center">
+                  Est. shares: ~{(estimatedShares / 1e9).toFixed(4)} {activeTab.toUpperCase()}
+                </div>
+              )}
+              
+              {/* Buy Button */}
+              <button 
+                onClick={() => handleBuy(activeTab)}
+                disabled={loading || vaporLoading || amountNum <= 0}
+                className={`w-full vapor-button ${
+                  activeTab === 'yes'
+                    ? 'bg-[var(--vapor-green)]/20 text-[var(--vapor-green)] hover:bg-[var(--vapor-green)]/30'
+                    : 'bg-[var(--vapor-red)]/20 text-[var(--vapor-red)] hover:bg-[var(--vapor-red)]/30'
+                } disabled:opacity-50`}
+              >
+                {loading || vaporLoading ? (
+                  <span className="animate-pulse">Processing...</span>
+                ) : !connected ? (
+                  'Connect Wallet'
+                ) : (
+                  `Buy ${activeTab.toUpperCase()} @ ${activeTab === 'yes' ? market.yesOdds : market.noOdds}%`
+                )}
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Sell Amount Input */}
+              {activePosition && (
+                <>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={sellAmount}
+                      onChange={(e) => setSellAmount(e.target.value)}
+                      className="flex-1 bg-[var(--vapor-bg)] border border-[var(--vapor-border)] rounded-lg px-3 py-2 text-white text-sm focus:border-[var(--vapor-accent)] focus:outline-none"
+                      placeholder={`Max: ${(activePosition.shares / 1e9).toFixed(4)}`}
+                      min="0"
+                      max={activePosition.shares / 1e9}
+                      step="0.0001"
+                    />
+                    <button 
+                      onClick={() => setSellAmount((activePosition.shares / 1e9).toString())}
+                      className="text-xs px-2 py-1 rounded bg-[var(--vapor-surface)] text-[var(--vapor-muted)] hover:text-white"
+                    >
+                      Max
+                    </button>
+                  </div>
+                  
+                  <div className="text-xs text-[var(--vapor-muted)] text-center">
+                    Available: {(activePosition.shares / 1e9).toFixed(4)} {activeTab.toUpperCase()} shares
+                  </div>
+                  
+                  {/* Sell Button */}
+                  <button 
+                    onClick={() => handleSell(activeTab)}
+                    disabled={loading || vaporLoading || (sellAmountNum <= 0 && !activePosition)}
+                    className={`w-full vapor-button ${
+                      activeTab === 'yes'
+                        ? 'bg-[var(--vapor-green)]/20 text-[var(--vapor-green)] hover:bg-[var(--vapor-green)]/30'
+                        : 'bg-[var(--vapor-red)]/20 text-[var(--vapor-red)] hover:bg-[var(--vapor-red)]/30'
+                    } disabled:opacity-50`}
+                  >
+                    {loading || vaporLoading ? (
+                      <span className="animate-pulse">Processing...</span>
+                    ) : (
+                      `Sell ${sellAmountNum > 0 ? sellAmountNum.toFixed(4) : 'All'} ${activeTab.toUpperCase()}`
+                    )}
+                  </button>
+                </>
+              )}
+            </>
           )}
-          
-          {/* Amount Input */}
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="flex-1 bg-[var(--vapor-bg)] border border-[var(--vapor-border)] rounded-lg px-3 py-2 text-white text-sm focus:border-[var(--vapor-accent)] focus:outline-none"
-              placeholder="Amount"
-              min="0.001"
-              step="0.01"
-            />
-            <span className="text-sm text-[var(--vapor-muted)]">SOL</span>
-          </div>
-          
-          {/* Estimate */}
-          {amountNum > 0 && (
-            <div className="text-xs text-[var(--vapor-muted)] text-center">
-              Est. shares: ~{(estimatedShares / 1e9).toFixed(4)} {activeTab.toUpperCase()}
-            </div>
-          )}
-          
-          {/* Buy Button */}
-          <button 
-            onClick={() => handleBuy(activeTab)}
-            disabled={loading || vaporLoading || amountNum <= 0}
-            className={`w-full vapor-button ${
-              activeTab === 'yes'
-                ? 'bg-[var(--vapor-green)]/20 text-[var(--vapor-green)] hover:bg-[var(--vapor-green)]/30'
-                : 'bg-[var(--vapor-red)]/20 text-[var(--vapor-red)] hover:bg-[var(--vapor-red)]/30'
-            } disabled:opacity-50`}
-          >
-            {loading || vaporLoading ? (
-              <span className="animate-pulse">Processing...</span>
-            ) : !connected ? (
-              'Connect Wallet'
-            ) : (
-              `Buy ${activeTab.toUpperCase()} @ ${activeTab === 'yes' ? market.yesOdds : market.noOdds}%`
-            )}
-          </button>
           
           {!connected && (
             <p className="text-center text-xs text-[var(--vapor-muted)]">

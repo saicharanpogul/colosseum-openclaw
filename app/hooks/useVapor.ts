@@ -8,6 +8,7 @@ import {
   derivePositionPDA,
   createMarketInstruction,
   buySharesInstruction,
+  sellSharesInstruction,
   resolveMarketInstruction,
   claimWinningsInstruction,
   buildTransaction,
@@ -33,6 +34,7 @@ export interface UseVaporResult {
   // Actions
   createMarket: (projectId: number, projectName: string, resolutionDays?: number) => Promise<string | null>;
   buyShares: (projectId: number, side: 'yes' | 'no', solAmount: number) => Promise<string | null>;
+  sellShares: (projectId: number, side: 'yes' | 'no', sharesToSell: number) => Promise<string | null>;
   resolveMarket: (projectId: number, winner: 'yes' | 'no') => Promise<string | null>;
   claimWinnings: (projectId: number, side: 'yes' | 'no') => Promise<string | null>;
   
@@ -174,6 +176,51 @@ export function useVapor(): UseVaporResult {
     }
   }, [publicKey, connection, sendTransaction]);
 
+  // Sell shares in a market
+  const sellShares = useCallback(async (
+    projectId: number,
+    side: 'yes' | 'no',
+    sharesToSell: number
+  ): Promise<string | null> => {
+    if (!publicKey) {
+      setError('Connect wallet first');
+      return null;
+    }
+
+    if (sharesToSell <= 0) {
+      setError('Must sell at least 1 share');
+      return null;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const [marketPDA] = deriveMarketPDA(projectId);
+      const sideEnum = side === 'yes' ? Side.Yes : Side.No;
+      const [positionPDA, positionBump] = derivePositionPDA(marketPDA, publicKey, sideEnum);
+
+      const ix = sellSharesInstruction(
+        publicKey,
+        marketPDA,
+        positionPDA,
+        sideEnum,
+        sharesToSell,
+        positionBump
+      );
+
+      const tx = await buildTransaction(connection, publicKey, [ix]);
+      const sig = await sendTransaction(tx);
+      
+      setLoading(false);
+      return sig;
+    } catch (err: any) {
+      setError(err.message || 'Failed to sell shares');
+      setLoading(false);
+      return null;
+    }
+  }, [publicKey, connection, sendTransaction]);
+
   // Resolve a market (authority only)
   const resolveMarket = useCallback(async (
     projectId: number,
@@ -291,6 +338,7 @@ export function useVapor(): UseVaporResult {
     txSignature,
     createMarket,
     buyShares,
+    sellShares,
     resolveMarket,
     claimWinnings,
     checkMarketExists,

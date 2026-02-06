@@ -3,6 +3,7 @@
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { FaucetButton } from './FaucetButton';
 
 export function Header() {
@@ -77,6 +78,12 @@ export function Header() {
             {mounted && (
               connected ? (
                 <div className="flex items-center gap-3">
+                  <Link 
+                    href="/profile"
+                    className="vapor-button vapor-button-outline text-sm"
+                  >
+                    Portfolio
+                  </Link>
                   <FaucetButton />
                   {balance !== null && (
                     <div className="hidden sm:block text-sm text-[var(--vapor-muted)]">

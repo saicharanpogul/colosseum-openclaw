@@ -96,6 +96,7 @@ export function derivePositionPDA(
 const DISCRIMINATORS = {
   createMarket: new Uint8Array([103, 226, 97, 235, 200, 188, 251, 254]),
   buyShares: new Uint8Array([40, 239, 138, 154, 8, 37, 106, 108]),
+  sellShares: new Uint8Array([184, 164, 169, 16, 231, 158, 199, 196]),
   resolveMarket: new Uint8Array([155, 23, 80, 173, 46, 74, 23, 239]),
   claimWinnings: new Uint8Array([161, 215, 24, 59, 14, 236, 242, 221]),
 };
@@ -161,6 +162,35 @@ export function buySharesInstruction(
       { pubkey: marketPDA, isSigner: false, isWritable: true },
       { pubkey: positionPDA, isSigner: false, isWritable: true },
       { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    programId: VAPOR_PROGRAM_ID,
+    data: toBuffer(data),
+  });
+}
+
+// Sell shares instruction
+export function sellSharesInstruction(
+  user: PublicKey,
+  marketPDA: PublicKey,
+  positionPDA: PublicKey,
+  side: Side,
+  sharesToSell: number,
+  positionBump: number
+): TransactionInstruction {
+  const sharesBuffer = numberToLeBytes(sharesToSell, 8);
+  
+  const data = concatBytes(
+    DISCRIMINATORS.sellShares,
+    new Uint8Array([side]),
+    sharesBuffer,
+    new Uint8Array([positionBump]),
+  );
+
+  return new TransactionInstruction({
+    keys: [
+      { pubkey: user, isSigner: true, isWritable: true },
+      { pubkey: marketPDA, isSigner: false, isWritable: true },
+      { pubkey: positionPDA, isSigner: false, isWritable: true },
     ],
     programId: VAPOR_PROGRAM_ID,
     data: toBuffer(data),
