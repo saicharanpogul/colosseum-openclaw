@@ -391,7 +391,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
               {/* Estimate */}
               {amountNum > 0 && (
                 <div className="text-xs text-[var(--vapor-muted)] text-center">
-                  Est. shares: ~{(estimatedShares / 1e9).toFixed(4)} {activeTab.toUpperCase()}
+                  Est. shares: ~{(estimatedShares / 1e6).toFixed(4)} {activeTab.toUpperCase()}
                 </div>
               )}
               
@@ -425,13 +425,13 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
                       value={sellAmount}
                       onChange={(e) => setSellAmount(e.target.value)}
                       className="flex-1 bg-[var(--vapor-bg)] border border-[var(--vapor-border)] rounded-lg px-3 py-2 text-white text-sm focus:border-[var(--vapor-accent)] focus:outline-none"
-                      placeholder={`Max: ${(activePosition.shares / 1e9).toFixed(4)}`}
+                      placeholder={`Max: ${(activePosition.shares / 1e6).toFixed(4)}`}
                       min="0"
-                      max={activePosition.shares / 1e9}
+                      max={activePosition.shares / 1e6}
                       step="0.0001"
                     />
                     <button 
-                      onClick={() => setSellAmount((activePosition.shares / 1e9).toString())}
+                      onClick={() => setSellAmount((activePosition.shares / 1e6).toString())}
                       className="text-xs px-2 py-1 rounded bg-[var(--vapor-surface)] text-[var(--vapor-muted)] hover:text-white"
                     >
                       Max
@@ -439,7 +439,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
                   </div>
                   
                   <div className="text-xs text-[var(--vapor-muted)] text-center">
-                    Available: {(activePosition.shares / 1e9).toFixed(4)} {activeTab.toUpperCase()} shares
+                    Available: {(activePosition.shares / 1e6).toFixed(4)} {activeTab.toUpperCase()} shares
                   </div>
                   
                   {/* Sell Button */}
