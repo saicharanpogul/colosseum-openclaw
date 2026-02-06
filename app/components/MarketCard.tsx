@@ -31,6 +31,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
   const [marketOnChain, setMarketOnChain] = useState<boolean | null>(null);
   const [position, setPosition] = useState<{ side: 'yes' | 'no'; shares: number } | null>(null);
   const [showTxLink, setShowTxLink] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'yes' | 'no'>('yes');
   
   const isResolved = market.status === 'resolved';
   const amountNum = parseFloat(amount) || 0;
@@ -50,6 +51,10 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
       if (connected && publicKey) {
         const pos = await getPosition(market.projectId);
         setPosition(pos);
+        // If user has position, default to that tab
+        if (pos) {
+          setActiveTab(pos.side);
+        }
       } else {
         setPosition(null);
       }
@@ -66,17 +71,22 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
     
     if (loading || vaporLoading || amountNum <= 0) return;
     
+    // Check if user already has opposite position
+    if (position && position.side !== side) {
+      clearError();
+      return;
+    }
+    
     setLoading(true);
     clearError();
     
     try {
       // First, ensure market exists on-chain
       if (!marketOnChain) {
-        // Create market first
         const createSig = await createMarket(
           market.projectId,
           market.projectName,
-          7 // 7 days until resolution
+          7
         );
         
         if (!createSig) {
@@ -93,13 +103,13 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
       if (sig) {
         setShowTxLink(sig);
         
-        // Update local state via API (for UI sync)
+        // Update local state via API
         const res = await fetch(`/api/markets/${market.id}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             side, 
-            amount: Math.floor(amountNum * 1_000_000), // Convert to mock tokens
+            amount: Math.floor(amountNum * 1_000_000),
             txSignature: sig 
           }),
         });
@@ -113,7 +123,6 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
         const pos = await getPosition(market.projectId);
         setPosition(pos);
         
-        // Clear tx link after 10 seconds
         setTimeout(() => setShowTxLink(null), 10000);
       }
     } catch (error) {
@@ -124,15 +133,16 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
   };
   
   // Calculate estimated shares
-  const estimatedYesShares = amountNum > 0 
-    ? estimateTrade(market.yesPool, market.noPool, amountNum, 'yes')
+  const estimatedShares = amountNum > 0 
+    ? estimateTrade(market.yesPool, market.noPool, amountNum, activeTab)
     : 0;
-  const estimatedNoShares = amountNum > 0 
-    ? estimateTrade(market.yesPool, market.noPool, amountNum, 'no')
-    : 0;
+  
+  // Check if opposite side is locked
+  const oppositePosition = position && position.side !== activeTab;
   
   return (
     <div className="vapor-card p-6">
+      {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-white mb-1">
@@ -183,11 +193,16 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
             ? 'bg-[var(--vapor-green)]/10 border border-[var(--vapor-green)]/30' 
             : 'bg-[var(--vapor-red)]/10 border border-[var(--vapor-red)]/30'
         }`}>
-          <div className="text-sm">
-            <span className="text-[var(--vapor-muted)]">Your position: </span>
-            <span className={position.side === 'yes' ? 'text-[var(--vapor-green)]' : 'text-[var(--vapor-red)]'}>
-              {position.shares.toLocaleString()} {position.side.toUpperCase()} shares
-            </span>
+          <div className="flex justify-between items-center">
+            <div className="text-sm">
+              <span className="text-[var(--vapor-muted)]">Your position: </span>
+              <span className={position.side === 'yes' ? 'text-[var(--vapor-green)]' : 'text-[var(--vapor-red)]'}>
+                {(position.shares / 1e9).toFixed(4)} {position.side.toUpperCase()}
+              </span>
+            </div>
+            <div className="text-xs text-[var(--vapor-muted)]">
+              (Sell coming soon)
+            </div>
           </div>
         </div>
       )}
@@ -195,27 +210,17 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
       {/* Stats */}
       <div className="flex items-center justify-between text-sm mb-4">
         <div className="text-[var(--vapor-muted)]">
-          Volume: <span className="text-white">{market.totalVolume.toLocaleString()}</span>
+          Vol: <span className="text-white">{market.totalVolume.toLocaleString()}</span>
         </div>
         {market.marketAddress && (
           <a 
             href={`https://explorer.solana.com/address/${market.marketAddress}?cluster=devnet`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[var(--vapor-accent)] text-xs font-mono hover:underline truncate max-w-[120px]"
-            title={market.marketAddress}
+            className="text-[var(--vapor-accent)] text-xs font-mono hover:underline"
           >
             {market.marketAddress.slice(0, 4)}...{market.marketAddress.slice(-4)}
           </a>
-        )}
-        {isResolved && market.resolution && (
-          <div className={`font-medium ${
-            market.resolution === 'yes' 
-              ? 'text-[var(--vapor-green)]' 
-              : 'text-[var(--vapor-red)]'
-          }`}>
-            Resolved: {market.resolution.toUpperCase()}
-          </div>
         )}
       </div>
       
@@ -230,14 +235,14 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
       {showTxLink && (
         <div className="mb-4 p-3 rounded-lg bg-[var(--vapor-green)]/10 border border-[var(--vapor-green)]/30">
           <p className="text-sm text-[var(--vapor-green)]">
-            ✓ Transaction confirmed!{' '}
+            ✓ Confirmed!{' '}
             <a 
               href={`https://explorer.solana.com/tx/${showTxLink}?cluster=devnet`}
               target="_blank"
               rel="noopener noreferrer"
               className="underline"
             >
-              View on Solana Explorer
+              View TX
             </a>
           </p>
         </div>
@@ -246,6 +251,40 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
       {/* Trading Interface */}
       {!isResolved && (
         <div className="space-y-3">
+          {/* Tab Selector */}
+          <div className="flex rounded-lg overflow-hidden border border-[var(--vapor-border)]">
+            <button
+              onClick={() => setActiveTab('yes')}
+              disabled={position?.side === 'no'}
+              className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'yes'
+                  ? 'bg-[var(--vapor-green)]/20 text-[var(--vapor-green)]'
+                  : 'bg-transparent text-[var(--vapor-muted)] hover:bg-[var(--vapor-surface)]'
+              } ${position?.side === 'no' ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              Buy YES
+            </button>
+            <button
+              onClick={() => setActiveTab('no')}
+              disabled={position?.side === 'yes'}
+              className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'no'
+                  ? 'bg-[var(--vapor-red)]/20 text-[var(--vapor-red)]'
+                  : 'bg-transparent text-[var(--vapor-muted)] hover:bg-[var(--vapor-surface)]'
+              } ${position?.side === 'yes' ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              Buy NO
+            </button>
+          </div>
+          
+          {/* Locked Position Warning */}
+          {position && oppositePosition && (
+            <p className="text-xs text-[var(--vapor-muted)] text-center">
+              ⚠️ You have a {position.side.toUpperCase()} position. Can only buy more {position.side.toUpperCase()}.
+            </p>
+          )}
+          
+          {/* Amount Input */}
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -259,47 +298,52 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
             <span className="text-sm text-[var(--vapor-muted)]">SOL</span>
           </div>
           
+          {/* Estimate */}
           {amountNum > 0 && (
-            <div className="flex justify-between text-xs text-[var(--vapor-muted)]">
-              <span>Est. YES shares: ~{(estimatedYesShares / 1e9).toFixed(2)}</span>
-              <span>Est. NO shares: ~{(estimatedNoShares / 1e9).toFixed(2)}</span>
+            <div className="text-xs text-[var(--vapor-muted)] text-center">
+              Est. shares: ~{(estimatedShares / 1e9).toFixed(4)} {activeTab.toUpperCase()}
             </div>
           )}
           
-          <div className="flex gap-3">
-            <button 
-              onClick={() => handleBuy('yes')}
-              disabled={loading || vaporLoading || amountNum <= 0}
-              className="flex-1 vapor-button bg-[var(--vapor-green)]/20 text-[var(--vapor-green)] hover:bg-[var(--vapor-green)]/30 disabled:opacity-50"
-            >
-              {loading || vaporLoading ? (
-                <span className="animate-pulse">Processing...</span>
-              ) : !connected ? (
-                'Connect Wallet'
-              ) : (
-                `Buy Yes @ ${market.yesOdds}%`
-              )}
-            </button>
-            <button 
-              onClick={() => handleBuy('no')}
-              disabled={loading || vaporLoading || amountNum <= 0}
-              className="flex-1 vapor-button bg-[var(--vapor-red)]/20 text-[var(--vapor-red)] hover:bg-[var(--vapor-red)]/30 disabled:opacity-50"
-            >
-              {loading || vaporLoading ? (
-                <span className="animate-pulse">Processing...</span>
-              ) : !connected ? (
-                'Connect Wallet'
-              ) : (
-                `Buy No @ ${market.noOdds}%`
-              )}
-            </button>
-          </div>
+          {/* Buy Button */}
+          <button 
+            onClick={() => handleBuy(activeTab)}
+            disabled={loading || vaporLoading || amountNum <= 0 || !!(position && position.side !== activeTab)}
+            className={`w-full vapor-button ${
+              activeTab === 'yes'
+                ? 'bg-[var(--vapor-green)]/20 text-[var(--vapor-green)] hover:bg-[var(--vapor-green)]/30'
+                : 'bg-[var(--vapor-red)]/20 text-[var(--vapor-red)] hover:bg-[var(--vapor-red)]/30'
+            } disabled:opacity-50`}
+          >
+            {loading || vaporLoading ? (
+              <span className="animate-pulse">Processing...</span>
+            ) : !connected ? (
+              'Connect Wallet'
+            ) : (
+              `Buy ${activeTab.toUpperCase()} @ ${activeTab === 'yes' ? market.yesOdds : market.noOdds}%`
+            )}
+          </button>
           
           {!connected && (
             <p className="text-center text-xs text-[var(--vapor-muted)]">
-              Connect your wallet to trade on-chain
+              Connect wallet to trade
             </p>
           )}
+        </div>
+      )}
+      
+      {/* Resolved State */}
+      {isResolved && market.resolution && (
+        <div className={`text-center p-4 rounded-lg ${
+          market.resolution === 'yes'
+            ? 'bg-[var(--vapor-green)]/10'
+            : 'bg-[var(--vapor-red)]/10'
+        }`}>
+          <span className={`text-lg font-bold ${
+            market.resolution === 'yes' ? 'text-[var(--vapor-green)]' : 'text-[var(--vapor-red)]'
+          }`}>
+            Resolved: {market.resolution.toUpperCase()}
+          </span>
         </div>
       )}
     </div>
