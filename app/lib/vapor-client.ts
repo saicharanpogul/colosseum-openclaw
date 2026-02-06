@@ -80,13 +80,14 @@ export function deriveMarketPDA(projectId: number): [PublicKey, number] {
   );
 }
 
-// Derive position PDA
+// Derive position PDA (now includes side for separate YES/NO positions)
 export function derivePositionPDA(
   marketPDA: PublicKey,
-  userWallet: PublicKey
+  userWallet: PublicKey,
+  side: Side
 ): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
-    [POSITION_SEED, marketPDA.toBytes(), userWallet.toBytes()],
+    [POSITION_SEED, marketPDA.toBytes(), userWallet.toBytes(), new Uint8Array([side])],
     VAPOR_PROGRAM_ID
   );
 }
@@ -187,12 +188,18 @@ export function resolveMarketInstruction(
   });
 }
 
-// Claim winnings instruction
+// Claim winnings instruction (now requires side)
 export function claimWinningsInstruction(
   user: PublicKey,
   marketPDA: PublicKey,
-  positionPDA: PublicKey
+  positionPDA: PublicKey,
+  side: Side
 ): TransactionInstruction {
+  const data = concatBytes(
+    DISCRIMINATORS.claimWinnings,
+    new Uint8Array([side]),
+  );
+  
   return new TransactionInstruction({
     keys: [
       { pubkey: user, isSigner: true, isWritable: true },
@@ -200,7 +207,7 @@ export function claimWinningsInstruction(
       { pubkey: positionPDA, isSigner: false, isWritable: true },
     ],
     programId: VAPOR_PROGRAM_ID,
-    data: toBuffer(DISCRIMINATORS.claimWinnings),
+    data: toBuffer(data),
   });
 }
 
@@ -250,10 +257,11 @@ export async function getMarketAccount(projectId: number): Promise<{
   }
 }
 
-// Get position for a user
+// Get position for a user (for a specific side)
 export async function getPositionAccount(
   projectId: number,
-  userWallet: PublicKey
+  userWallet: PublicKey,
+  side: Side
 ): Promise<{
   exists: boolean;
   address: string;
@@ -264,7 +272,7 @@ export async function getPositionAccount(
   };
 }> {
   const [marketPDA] = deriveMarketPDA(projectId);
-  const [positionPDA] = derivePositionPDA(marketPDA, userWallet);
+  const [positionPDA] = derivePositionPDA(marketPDA, userWallet, side);
   
   try {
     const accountInfo = await connection.getAccountInfo(positionPDA);

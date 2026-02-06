@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Market } from '@/lib/types';
-import { useVapor } from '@/hooks/useVapor';
+import { useVapor, PositionData } from '@/hooks/useVapor';
 
 interface MarketCardProps {
   market: Market;
@@ -21,7 +21,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
     buyShares, 
     createMarket,
     checkMarketExists,
-    getPosition,
+    getPositions,
     estimateTrade,
     clearError 
   } = useVapor();
@@ -29,7 +29,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState<string>('0.01');
   const [marketOnChain, setMarketOnChain] = useState<boolean | null>(null);
-  const [position, setPosition] = useState<{ side: 'yes' | 'no'; shares: number } | null>(null);
+  const [positions, setPositions] = useState<{ yes: PositionData | null; no: PositionData | null }>({ yes: null, no: null });
   const [showTxLink, setShowTxLink] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'yes' | 'no'>('yes');
   
@@ -45,22 +45,18 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
     check();
   }, [market.projectId, checkMarketExists]);
   
-  // Fetch user's position
+  // Fetch user's positions (both YES and NO)
   useEffect(() => {
-    const fetchPosition = async () => {
+    const fetchPositions = async () => {
       if (connected && publicKey) {
-        const pos = await getPosition(market.projectId);
-        setPosition(pos);
-        // If user has position, default to that tab
-        if (pos) {
-          setActiveTab(pos.side);
-        }
+        const pos = await getPositions(market.projectId);
+        setPositions(pos);
       } else {
-        setPosition(null);
+        setPositions({ yes: null, no: null });
       }
     };
-    fetchPosition();
-  }, [connected, publicKey, market.projectId, getPosition, txSignature]);
+    fetchPositions();
+  }, [connected, publicKey, market.projectId, getPositions, txSignature]);
   
   // Handle buy with on-chain transaction
   const handleBuy = async (side: 'yes' | 'no') => {
@@ -70,12 +66,6 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
     }
     
     if (loading || vaporLoading || amountNum <= 0) return;
-    
-    // Check if user already has opposite position
-    if (position && position.side !== side) {
-      clearError();
-      return;
-    }
     
     setLoading(true);
     clearError();
@@ -119,9 +109,9 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
           onUpdate(data.market);
         }
         
-        // Refresh position
-        const pos = await getPosition(market.projectId);
-        setPosition(pos);
+        // Refresh positions
+        const pos = await getPositions(market.projectId);
+        setPositions(pos);
         
         setTimeout(() => setShowTxLink(null), 10000);
       }
@@ -137,8 +127,8 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
     ? estimateTrade(market.yesPool, market.noPool, amountNum, activeTab)
     : 0;
   
-  // Check if opposite side is locked
-  const oppositePosition = position && position.side !== activeTab;
+  const activePosition = activeTab === 'yes' ? positions.yes : positions.no;
+  const hasAnyPosition = positions.yes || positions.no;
   
   return (
     <div className="vapor-card p-6">
@@ -186,24 +176,23 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
         </div>
       </div>
       
-      {/* Position Display */}
-      {position && (
-        <div className={`mb-4 p-3 rounded-lg ${
-          position.side === 'yes' 
-            ? 'bg-[var(--vapor-green)]/10 border border-[var(--vapor-green)]/30' 
-            : 'bg-[var(--vapor-red)]/10 border border-[var(--vapor-red)]/30'
-        }`}>
-          <div className="flex justify-between items-center">
-            <div className="text-sm">
-              <span className="text-[var(--vapor-muted)]">Your position: </span>
-              <span className={position.side === 'yes' ? 'text-[var(--vapor-green)]' : 'text-[var(--vapor-red)]'}>
-                {(position.shares / 1e9).toFixed(4)} {position.side.toUpperCase()}
+      {/* Positions Display */}
+      {hasAnyPosition && (
+        <div className="mb-4 space-y-2">
+          {positions.yes && (
+            <div className="p-2 rounded-lg bg-[var(--vapor-green)]/10 border border-[var(--vapor-green)]/30 flex justify-between items-center">
+              <span className="text-sm text-[var(--vapor-green)]">
+                YES: {(positions.yes.shares / 1e9).toFixed(4)} shares
               </span>
             </div>
-            <div className="text-xs text-[var(--vapor-muted)]">
-              (Sell coming soon)
+          )}
+          {positions.no && (
+            <div className="p-2 rounded-lg bg-[var(--vapor-red)]/10 border border-[var(--vapor-red)]/30 flex justify-between items-center">
+              <span className="text-sm text-[var(--vapor-red)]">
+                NO: {(positions.no.shares / 1e9).toFixed(4)} shares
+              </span>
             </div>
-          </div>
+          )}
         </div>
       )}
       
@@ -255,32 +244,30 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
           <div className="flex rounded-lg overflow-hidden border border-[var(--vapor-border)]">
             <button
               onClick={() => setActiveTab('yes')}
-              disabled={position?.side === 'no'}
               className={`flex-1 py-2 text-sm font-medium transition-colors ${
                 activeTab === 'yes'
                   ? 'bg-[var(--vapor-green)]/20 text-[var(--vapor-green)]'
                   : 'bg-transparent text-[var(--vapor-muted)] hover:bg-[var(--vapor-surface)]'
-              } ${position?.side === 'no' ? 'opacity-50 cursor-not-allowed' : ''}`}
+              }`}
             >
               Buy YES
             </button>
             <button
               onClick={() => setActiveTab('no')}
-              disabled={position?.side === 'yes'}
               className={`flex-1 py-2 text-sm font-medium transition-colors ${
                 activeTab === 'no'
                   ? 'bg-[var(--vapor-red)]/20 text-[var(--vapor-red)]'
                   : 'bg-transparent text-[var(--vapor-muted)] hover:bg-[var(--vapor-surface)]'
-              } ${position?.side === 'yes' ? 'opacity-50 cursor-not-allowed' : ''}`}
+              }`}
             >
               Buy NO
             </button>
           </div>
           
-          {/* Locked Position Warning */}
-          {position && oppositePosition && (
-            <p className="text-xs text-[var(--vapor-muted)] text-center">
-              ⚠️ You have a {position.side.toUpperCase()} position. Can only buy more {position.side.toUpperCase()}.
+          {/* Current Position for Tab */}
+          {activePosition && (
+            <p className="text-xs text-center text-[var(--vapor-muted)]">
+              You have {(activePosition.shares / 1e9).toFixed(4)} {activeTab.toUpperCase()} shares
             </p>
           )}
           
@@ -308,7 +295,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
           {/* Buy Button */}
           <button 
             onClick={() => handleBuy(activeTab)}
-            disabled={loading || vaporLoading || amountNum <= 0 || !!(position && position.side !== activeTab)}
+            disabled={loading || vaporLoading || amountNum <= 0}
             className={`w-full vapor-button ${
               activeTab === 'yes'
                 ? 'bg-[var(--vapor-green)]/20 text-[var(--vapor-green)] hover:bg-[var(--vapor-green)]/30'

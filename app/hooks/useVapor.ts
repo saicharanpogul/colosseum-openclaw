@@ -19,6 +19,11 @@ import {
   lamportsToSol,
 } from '@/lib/vapor-client';
 
+export interface PositionData {
+  side: 'yes' | 'no';
+  shares: number;
+}
+
 export interface UseVaporResult {
   // State
   loading: boolean;
@@ -29,11 +34,12 @@ export interface UseVaporResult {
   createMarket: (projectId: number, projectName: string, resolutionDays?: number) => Promise<string | null>;
   buyShares: (projectId: number, side: 'yes' | 'no', solAmount: number) => Promise<string | null>;
   resolveMarket: (projectId: number, winner: 'yes' | 'no') => Promise<string | null>;
-  claimWinnings: (projectId: number) => Promise<string | null>;
+  claimWinnings: (projectId: number, side: 'yes' | 'no') => Promise<string | null>;
   
   // Queries
   checkMarketExists: (projectId: number) => Promise<boolean>;
-  getPosition: (projectId: number) => Promise<{ side: 'yes' | 'no'; shares: number } | null>;
+  getPosition: (projectId: number, side: 'yes' | 'no') => Promise<PositionData | null>;
+  getPositions: (projectId: number) => Promise<{ yes: PositionData | null; no: PositionData | null }>;
   estimateTrade: (yesPool: number, noPool: number, amount: number, side: 'yes' | 'no') => number;
   
   // Helpers
@@ -63,7 +69,6 @@ export function useVapor(): UseVaporResult {
       const signed = await signTransaction(tx);
       const signature = await connection.sendRawTransaction(signed.serialize());
       
-      // Wait for confirmation
       await connection.confirmTransaction(signature, 'confirmed');
       
       setTxSignature(signature);
@@ -92,7 +97,6 @@ export function useVapor(): UseVaporResult {
     try {
       const [marketPDA, bump] = deriveMarketPDA(projectId);
       
-      // Check if market already exists
       const existing = await getMarketAccount(projectId);
       if (existing.exists) {
         setError('Market already exists');
@@ -144,10 +148,10 @@ export function useVapor(): UseVaporResult {
 
     try {
       const [marketPDA] = deriveMarketPDA(projectId);
-      const [positionPDA, positionBump] = derivePositionPDA(marketPDA, publicKey);
+      const sideEnum = side === 'yes' ? Side.Yes : Side.No;
+      const [positionPDA, positionBump] = derivePositionPDA(marketPDA, publicKey, sideEnum);
       
       const amount = solToLamports(solAmount);
-      const sideEnum = side === 'yes' ? Side.Yes : Side.No;
 
       const ix = buySharesInstruction(
         publicKey,
@@ -203,7 +207,8 @@ export function useVapor(): UseVaporResult {
 
   // Claim winnings from resolved market
   const claimWinnings = useCallback(async (
-    projectId: number
+    projectId: number,
+    side: 'yes' | 'no'
   ): Promise<string | null> => {
     if (!publicKey) {
       setError('Connect wallet first');
@@ -215,9 +220,10 @@ export function useVapor(): UseVaporResult {
 
     try {
       const [marketPDA] = deriveMarketPDA(projectId);
-      const [positionPDA] = derivePositionPDA(marketPDA, publicKey);
+      const sideEnum = side === 'yes' ? Side.Yes : Side.No;
+      const [positionPDA] = derivePositionPDA(marketPDA, publicKey, sideEnum);
 
-      const ix = claimWinningsInstruction(publicKey, marketPDA, positionPDA);
+      const ix = claimWinningsInstruction(publicKey, marketPDA, positionPDA, sideEnum);
 
       const tx = await buildTransaction(connection, publicKey, [ix]);
       const sig = await sendTransaction(tx);
@@ -237,20 +243,36 @@ export function useVapor(): UseVaporResult {
     return result.exists;
   }, []);
 
-  // Get user's position in a market
+  // Get user's position for a specific side
   const getPosition = useCallback(async (
-    projectId: number
-  ): Promise<{ side: 'yes' | 'no'; shares: number } | null> => {
+    projectId: number,
+    side: 'yes' | 'no'
+  ): Promise<PositionData | null> => {
     if (!publicKey) return null;
 
-    const result = await getPositionAccount(projectId, publicKey);
+    const sideEnum = side === 'yes' ? Side.Yes : Side.No;
+    const result = await getPositionAccount(projectId, publicKey, sideEnum);
     if (!result.exists || !result.data) return null;
 
     return {
-      side: result.data.side === Side.Yes ? 'yes' : 'no',
+      side,
       shares: result.data.shares,
     };
   }, [publicKey]);
+
+  // Get both YES and NO positions
+  const getPositions = useCallback(async (
+    projectId: number
+  ): Promise<{ yes: PositionData | null; no: PositionData | null }> => {
+    if (!publicKey) return { yes: null, no: null };
+
+    const [yesPos, noPos] = await Promise.all([
+      getPosition(projectId, 'yes'),
+      getPosition(projectId, 'no'),
+    ]);
+
+    return { yes: yesPos, no: noPos };
+  }, [publicKey, getPosition]);
 
   // Estimate shares from trade
   const estimateTrade = useCallback((
@@ -273,6 +295,7 @@ export function useVapor(): UseVaporResult {
     claimWinnings,
     checkMarketExists,
     getPosition,
+    getPositions,
     estimateTrade,
     clearError,
   };

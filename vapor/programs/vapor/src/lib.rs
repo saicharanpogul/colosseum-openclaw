@@ -79,7 +79,7 @@ pub mod vapor {
             position.avg_price = calculate_price(amount, shares);
             position.bump = position_bump;
         } else {
-            require!(position.side == side, VaporError::WrongSide);
+            // Accumulate position (same side guaranteed by PDA seeds)
             let total_cost = position.avg_price
                 .checked_mul(position.shares).ok_or(VaporError::Overflow)?
                 .checked_add(amount).ok_or(VaporError::Overflow)?;
@@ -122,7 +122,7 @@ pub mod vapor {
     }
 
     /// Claim winnings from a resolved market
-    pub fn claim_winnings(ctx: Context<ClaimWinnings>) -> Result<()> {
+    pub fn claim_winnings(ctx: Context<ClaimWinnings>, side: Side) -> Result<()> {
         let market = &ctx.accounts.market;
         let position = &mut ctx.accounts.position;
         
@@ -271,7 +271,7 @@ pub struct BuyShares<'info> {
         init_if_needed,
         payer = user,
         space = Position::LEN,
-        seeds = [POSITION_SEED, market.key().as_ref(), user.key().as_ref()],
+        seeds = [POSITION_SEED, market.key().as_ref(), user.key().as_ref(), &[side as u8]],
         bump
     )]
     pub position: Account<'info, Position>,
@@ -289,6 +289,7 @@ pub struct ResolveMarket<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(side: Side)]
 pub struct ClaimWinnings<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
@@ -297,7 +298,7 @@ pub struct ClaimWinnings<'info> {
     
     #[account(
         mut,
-        seeds = [POSITION_SEED, market.key().as_ref(), user.key().as_ref()],
+        seeds = [POSITION_SEED, market.key().as_ref(), user.key().as_ref(), &[side as u8]],
         bump = position.bump
     )]
     pub position: Account<'info, Position>,
