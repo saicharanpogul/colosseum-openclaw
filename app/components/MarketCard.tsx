@@ -5,6 +5,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Market } from '@/lib/types';
 import { useVapor, PositionData } from '@/hooks/useVapor';
+import { PriceChart } from './PriceChart';
 
 interface MarketCardProps {
   market: Market;
@@ -156,6 +157,11 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
             </div>
           )}
         </div>
+      </div>
+      
+            {/* Price Chart */}
+      <div className="mb-4">
+        <PriceChart history={market.priceHistory || []} height={50} />
       </div>
       
       {/* Odds Display */}

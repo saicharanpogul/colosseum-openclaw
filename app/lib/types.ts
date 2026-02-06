@@ -39,6 +39,7 @@ export interface Market {
   createdAt: string;
   resolvedAt?: string;
   marketAddress?: string; // Solana PDA
+  priceHistory?: { timestamp: number; yesPrice: number; noPrice: number }[];
 }
 
 export interface MarketPosition {
