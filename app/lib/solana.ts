@@ -8,7 +8,7 @@ const DEVNET_RPC = clusterApiUrl('devnet');
 export const connection = new Connection(DEVNET_RPC, 'confirmed');
 
 // Vapor Program ID (deployed on devnet)
-export const VAPOR_PROGRAM_ID = new PublicKey('GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLwmuzqp5Dqkbd');
+export const VAPOR_PROGRAM_ID = new PublicKey('51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P');
 
 // Market PDA seeds
 export const MARKET_SEED = 'vapor-market';

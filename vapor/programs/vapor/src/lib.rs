@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLwmuzqp5Dqkbd");
+declare_id!("51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P");
 
 #[program]
 pub mod vapor {

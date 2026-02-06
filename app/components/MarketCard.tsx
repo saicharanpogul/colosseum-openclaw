@@ -98,13 +98,16 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
       if (sig) {
         setShowTxLink(sig);
         
-        // Update local state via API
+        // Update Supabase via API
         const res = await fetch(`/api/markets/${market.id}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             side, 
+            action: 'buy',
             amount: Math.floor(amountNum * 1_000_000),
+            shares: estimatedShares,
+            userAddress: publicKey?.toBase58(),
             txSignature: sig 
           }),
         });
@@ -151,6 +154,20 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
       if (sig) {
         setShowTxLink(sig);
         setSellAmount('');
+        
+        // Update Supabase via API
+        await fetch(`/api/markets/${market.id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            side, 
+            action: 'sell',
+            amount: sharesToSell,
+            shares: sharesToSell,
+            userAddress: publicKey?.toBase58(),
+            txSignature: sig 
+          }),
+        });
         
         // Refresh positions
         const pos = await getPositions(market.projectId);

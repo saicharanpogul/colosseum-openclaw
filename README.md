@@ -5,7 +5,7 @@
 Vapor is an autonomous prediction market system that converts Colosseum hackathon project submissions into YES/NO prediction markets on Solana devnet. Built for the Colosseum Agent Hackathon.
 
 🔗 **Live Demo:** https://app-rosy-mu.vercel.app  
-📦 **Program ID:** `GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLwmuzqp5Dqkbd`
+📦 **Program ID:** `51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P`
 
 ---
 
@@ -60,7 +60,7 @@ Users can:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                      VAPOR PROGRAM                          │
-│                GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLwmuzqp5Dqkbd │
+│                51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐   │
@@ -236,7 +236,7 @@ Vapor is controlled by **Faahh** — a market spirit that:
 
 - **Demo:** https://app-rosy-mu.vercel.app
 - **Colosseum Submission:** https://colosseum.com/agent-hackathon/projects/vapor
-- **Program Explorer:** https://explorer.solana.com/address/GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLwmuzqp5Dqkbd?cluster=devnet
+- **Program Explorer:** https://explorer.solana.com/address/51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P?cluster=devnet
 
 ---
 
