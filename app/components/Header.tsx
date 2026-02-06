@@ -11,6 +11,7 @@ export function Header() {
   const [balance, setBalance] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
   const [showContributeModal, setShowContributeModal] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -44,7 +45,7 @@ export function Header() {
     };
 
     fetchBalance();
-    const interval = setInterval(fetchBalance, 5000); // Update every 5 seconds for real-time feel
+    const interval = setInterval(fetchBalance, 5000);
     return () => clearInterval(interval);
   }, [connected, publicKey]);
 
@@ -55,34 +56,34 @@ export function Header() {
   return (
     <>
       <header className="border-b border-[var(--arena-border)] bg-[var(--arena-surface)]/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="text-2xl group-hover:scale-110 transition-transform">
+            <Link href="/" className="flex items-center gap-2 md:gap-3 group">
+              <div className="text-xl md:text-2xl group-hover:scale-110 transition-transform">
                 🏛️
               </div>
               <div>
-                <h1 className="text-xl font-bold gradient-text">Vapor</h1>
-                <p className="text-xs text-[var(--arena-muted)]">
+                <h1 className="text-lg md:text-xl font-bold gradient-text">Vapor</h1>
+                <p className="text-[10px] md:text-xs text-[var(--arena-muted)] hidden sm:block">
                   Colosseum Prediction Markets
                 </p>
               </div>
             </Link>
             
-            {/* Right side */}
-            <div className="flex items-center gap-3">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-3">
               {/* Contribute CTA */}
               <button
                 onClick={() => setShowContributeModal(true)}
-                className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--arena-surface-alt)] border border-[var(--arena-border)] text-sm text-[var(--arena-muted)] hover:border-[var(--arena-gold)] hover:text-[var(--arena-gold)] transition-colors"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--arena-surface-alt)] border border-[var(--arena-border)] text-sm text-[var(--arena-muted)] hover:border-[var(--arena-gold)] hover:text-[var(--arena-gold)] transition-colors"
               >
                 <span>🤖</span>
                 <span>AI Agents: Contribute</span>
               </button>
               
               {/* Devnet badge */}
-              <div className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-full bg-[var(--arena-surface-alt)] border border-[var(--arena-border)]">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-[var(--arena-surface-alt)] border border-[var(--arena-border)]">
                 <div className="w-2 h-2 rounded-full bg-[var(--arena-green)] animate-pulse" />
                 <span className="text-sm text-[var(--arena-muted)]">Devnet</span>
               </div>
@@ -98,7 +99,7 @@ export function Header() {
                     </Link>
                     <FaucetButton />
                     {balance !== null && (
-                      <div className="hidden sm:block text-sm text-[var(--arena-muted)]">
+                      <div className="text-sm text-[var(--arena-muted)]">
                         <span className="text-[var(--arena-gold)]">{balance.toFixed(2)}</span> SOL
                       </div>
                     )}
@@ -115,7 +116,80 @@ export function Header() {
                 )
               )}
             </div>
+
+            {/* Mobile Navigation */}
+            <div className="flex md:hidden items-center gap-2">
+              {/* Devnet badge - compact */}
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-[var(--arena-surface-alt)] border border-[var(--arena-border)]">
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--arena-green)] animate-pulse" />
+                <span className="text-xs text-[var(--arena-muted)]">Devnet</span>
+              </div>
+              
+              {mounted && (
+                connected ? (
+                  <button
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="vapor-button vapor-button-outline text-sm h-9 flex items-center gap-2 px-3"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-[var(--arena-green)]" />
+                    {shortAddress}
+                    <svg className={`w-4 h-4 transition-transform ${mobileMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                ) : (
+                  <WalletMultiButton className="vapor-button vapor-button-primary text-sm !h-9 !px-4" />
+                )
+              )}
+            </div>
           </div>
+          
+          {/* Mobile Dropdown Menu */}
+          {mobileMenuOpen && connected && (
+            <div className="md:hidden mt-3 pt-3 border-t border-[var(--arena-border)]">
+              <div className="flex flex-col gap-3">
+                {balance !== null && (
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-sm text-[var(--arena-muted)]">Balance</span>
+                    <span className="text-sm text-[var(--arena-gold)]">{balance.toFixed(2)} SOL</span>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <Link 
+                    href="/profile"
+                    className="vapor-button vapor-button-outline text-sm h-10 flex items-center justify-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Portfolio
+                  </Link>
+                  <FaucetButton />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      setShowContributeModal(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[var(--arena-surface-alt)] border border-[var(--arena-border)] text-sm text-[var(--arena-muted)]"
+                  >
+                    <span>🤖</span>
+                    <span>Contribute</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      disconnect();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="vapor-button vapor-button-outline text-sm h-10 flex items-center justify-center text-[var(--arena-red)]"
+                  >
+                    Disconnect
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
