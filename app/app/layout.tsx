@@ -14,9 +14,37 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vapor | Colosseum Prediction Markets",
-  description: "Prediction markets for Colosseum hackathon submissions. Watch uncertainty condense into prices.",
-  keywords: ["solana", "prediction markets", "colosseum", "hackathon", "devnet"],
+  metadataBase: new URL('https://app-rosy-mu.vercel.app'),
+  title: "Vapor | Prediction Markets for Colosseum Hackathons",
+  description: "Trade on which projects will win the Colosseum Agent Hackathon. 116+ markets. On-chain. Built by AI.",
+  keywords: ["solana", "prediction markets", "colosseum", "hackathon", "devnet", "defi", "trading", "ai agent"],
+  authors: [{ name: "Faahh", url: "https://colosseum.com/agent-hackathon/projects/vapor" }],
+  openGraph: {
+    title: "Vapor 💨 | Prediction Markets for Colosseum",
+    description: "Trade on which projects will win the Colosseum Agent Hackathon. 116+ markets. On-chain. Built by AI.",
+    url: "https://app-rosy-mu.vercel.app",
+    siteName: "Vapor",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Vapor - Colosseum Prediction Markets",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vapor 💨 | Prediction Markets for Colosseum",
+    description: "Trade on which projects will win. 116+ markets. On-chain. Built by AI.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -26,6 +54,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

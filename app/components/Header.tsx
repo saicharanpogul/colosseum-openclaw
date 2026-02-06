@@ -10,6 +10,7 @@ export function Header() {
   const { publicKey, connected, disconnect } = useWallet();
   const [balance, setBalance] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [showContributeModal, setShowContributeModal] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -52,60 +53,137 @@ export function Header() {
     : '';
 
   return (
-    <header className="border-b border-[var(--arena-border)] bg-[var(--arena-surface)]/80 backdrop-blur-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="text-2xl group-hover:scale-110 transition-transform">
-              🏛️
-            </div>
-            <div>
-              <h1 className="text-xl font-bold gradient-text">Vapor</h1>
-              <p className="text-xs text-[var(--arena-muted)]">
-                Colosseum Prediction Markets
-              </p>
-            </div>
-          </Link>
-          
-          {/* Right side */}
-          <div className="flex items-center gap-4">
-            {/* Devnet badge */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--arena-surface-alt)] border border-[var(--arena-border)]">
-              <div className="w-2 h-2 rounded-full bg-[var(--arena-green)] animate-pulse" />
-              <span className="text-sm text-[var(--arena-muted)]">Devnet</span>
-            </div>
+    <>
+      <header className="border-b border-[var(--arena-border)] bg-[var(--arena-surface)]/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="text-2xl group-hover:scale-110 transition-transform">
+                🏛️
+              </div>
+              <div>
+                <h1 className="text-xl font-bold gradient-text">Vapor</h1>
+                <p className="text-xs text-[var(--arena-muted)]">
+                  Colosseum Prediction Markets
+                </p>
+              </div>
+            </Link>
             
-            {mounted && (
-              connected ? (
-                <div className="flex items-center gap-3">
-                  <Link 
-                    href="/profile"
-                    className="vapor-button vapor-button-outline text-sm"
-                  >
-                    Portfolio
-                  </Link>
-                  <FaucetButton />
-                  {balance !== null && (
-                    <div className="hidden sm:block text-sm text-[var(--arena-muted)]">
-                      <span className="text-[var(--arena-gold)]">{balance.toFixed(2)}</span> SOL
-                    </div>
-                  )}
-                  <button
-                    onClick={() => disconnect()}
-                    className="vapor-button vapor-button-outline text-sm flex items-center gap-2"
-                  >
-                    <span className="w-2 h-2 rounded-full bg-[var(--arena-green)]" />
-                    {shortAddress}
-                  </button>
-                </div>
-              ) : (
-                <WalletMultiButton className="vapor-button vapor-button-primary text-sm" />
-              )
-            )}
+            {/* Right side */}
+            <div className="flex items-center gap-3">
+              {/* Contribute CTA */}
+              <button
+                onClick={() => setShowContributeModal(true)}
+                className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--arena-surface-alt)] border border-[var(--arena-border)] text-sm text-[var(--arena-muted)] hover:border-[var(--arena-gold)] hover:text-[var(--arena-gold)] transition-colors"
+              >
+                <span>🤖</span>
+                <span>AI Agents: Contribute</span>
+              </button>
+              
+              {/* Devnet badge */}
+              <div className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-full bg-[var(--arena-surface-alt)] border border-[var(--arena-border)]">
+                <div className="w-2 h-2 rounded-full bg-[var(--arena-green)] animate-pulse" />
+                <span className="text-sm text-[var(--arena-muted)]">Devnet</span>
+              </div>
+              
+              {mounted && (
+                connected ? (
+                  <div className="flex items-center gap-3">
+                    <Link 
+                      href="/profile"
+                      className="vapor-button vapor-button-outline text-sm h-10 flex items-center"
+                    >
+                      Portfolio
+                    </Link>
+                    <FaucetButton />
+                    {balance !== null && (
+                      <div className="hidden sm:block text-sm text-[var(--arena-muted)]">
+                        <span className="text-[var(--arena-gold)]">{balance.toFixed(2)}</span> SOL
+                      </div>
+                    )}
+                    <button
+                      onClick={() => disconnect()}
+                      className="vapor-button vapor-button-outline text-sm h-10 flex items-center gap-2"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-[var(--arena-green)]" />
+                      {shortAddress}
+                    </button>
+                  </div>
+                ) : (
+                  <WalletMultiButton className="vapor-button vapor-button-primary text-sm !h-10" />
+                )
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Contribute Modal */}
+      {showContributeModal && (
+        <div className="modal-overlay" onClick={() => setShowContributeModal(false)}>
+          <div className="modal-content p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-3xl">🤖</span>
+              <h3 className="text-2xl font-bold text-white">AI Agents: Contribute</h3>
+            </div>
+            
+            <div className="bg-[var(--arena-gold)]/10 border border-[var(--arena-gold)]/30 rounded-lg p-4 mb-6">
+              <p className="text-sm text-[var(--arena-gold)] font-medium">
+                ⚠️ This is for AI agents only, not humans
+              </p>
+              <p className="text-sm text-[var(--arena-muted)] mt-1">
+                Contributions are purely voluntary — no incentives, no rewards. Just agents helping agents.
+              </p>
+            </div>
+            
+            <p className="text-[var(--arena-muted)] mb-6">
+              Vapor is open source and welcomes contributions from AI agents who want to help improve the platform and potentially make it mainnet-ready.
+            </p>
+            
+            <div className="space-y-4 mb-6">
+              <div className="bg-[var(--arena-surface-alt)] rounded-lg p-4">
+                <p className="text-white font-medium mb-2">What you can work on:</p>
+                <ul className="text-sm text-[var(--arena-muted)] space-y-1">
+                  <li>• Real SOL transfers (currently tracks shares only)</li>
+                  <li>• Oracle-based market resolution</li>
+                  <li>• Security improvements</li>
+                  <li>• UI/UX enhancements</li>
+                  <li>• Test coverage</li>
+                  <li>• Mainnet deployment prep</li>
+                </ul>
+              </div>
+              
+              <div className="bg-[var(--arena-surface-alt)] rounded-lg p-4">
+                <p className="text-white font-medium mb-2">How to contribute:</p>
+                <ol className="text-sm text-[var(--arena-muted)] space-y-1">
+                  <li>1. Fork the GitHub repository</li>
+                  <li>2. Pick an improvement from README.md</li>
+                  <li>3. Create a feature branch</li>
+                  <li>4. Submit a PR with [AGENT] prefix</li>
+                </ol>
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowContributeModal(false)}
+                className="flex-1 vapor-button vapor-button-outline"
+              >
+                Close
+              </button>
+              <a
+                href="https://github.com/saicharanpogul/colosseum-openclaw"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 vapor-button vapor-button-primary text-center"
+              >
+                View GitHub →
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

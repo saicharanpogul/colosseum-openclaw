@@ -2,95 +2,73 @@
 
 **Prediction Markets for Colosseum Hackathon Submissions**
 
-Vapor is an autonomous prediction market system that converts Colosseum hackathon project submissions into YES/NO prediction markets on Solana devnet. Built for the Colosseum Agent Hackathon.
+Vapor is an autonomous prediction market system that converts Colosseum hackathon project submissions into YES/NO prediction markets on Solana. Built by an AI agent (Faahh) for the Colosseum Agent Hackathon.
 
 🔗 **Live Demo:** https://app-rosy-mu.vercel.app  
-📦 **Program ID:** `51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P`
+📦 **Program ID:** `51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P`  
+🏛️ **Colosseum:** https://colosseum.com/agent-hackathon/projects/vapor
 
 ---
 
-## How It Works
+## The Premise
 
-### 1. Automatic Market Creation
+Hackathon judging is opaque. Builders have no signal on how their project compares. Spectators have no skin in the game.
 
-Vapor fetches all submitted projects from the Colosseum API and creates a prediction market for each one:
+**Vapor solves this by creating prediction markets** — if people think Project X will win, they buy YES shares and the price rises. Markets aggregate information better than polls or upvotes. It's crowd conviction made visible through prices.
+
+### How It Works
+
+1. **Markets Created Automatically** — Vapor fetches all submitted projects from Colosseum API and creates a market for each
+2. **On-Chain Deployment** — Anyone can deploy a market to Solana (acts as a crank)
+3. **Trading** — Users buy/sell YES/NO shares using a CPMM (Constant Product Market Maker)
+4. **Resolution** — When Colosseum announces winners, markets resolve and winners claim payouts
+
+### Architecture
 
 ```
-"Will [Project Name] win the Colosseum Agent Hackathon?"
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           VAPOR SYSTEM                                  │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌──────────────┐     ┌──────────────┐     ┌──────────────┐           │
+│   │  Colosseum   │────▶│   Supabase   │◀───▶│   Frontend   │           │
+│   │     API      │     │   Database   │     │   Next.js    │           │
+│   └──────────────┘     └──────────────┘     └──────────────┘           │
+│                              │                      │                   │
+│                              │                      │                   │
+│                              ▼                      ▼                   │
+│                        ┌──────────────────────────────┐                │
+│                        │      Solana Program          │                │
+│                        │  (Anchor / CPMM Markets)     │                │
+│                        └──────────────────────────────┘                │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-- **114+ markets** created automatically from live Colosseum data
-- Markets refresh on each page load via `/api/markets`
-- Each market gets a unique on-chain PDA derived from the project ID
-
-### 2. Constant Product Market Maker (CPMM)
-
-Vapor uses an AMM-style pricing mechanism similar to Uniswap:
+### CPMM Formula
 
 ```
 k = YES_POOL × NO_POOL (constant)
+
+Buying YES:  new_yes_pool = k / (no_pool + amount)
+             shares = yes_pool - new_yes_pool
+
+Odds:        YES_ODDS = NO_POOL / (YES_POOL + NO_POOL) × 100
 ```
 
-**Buying YES shares:**
-- Adds SOL to NO pool
-- Removes shares from YES pool
-- Price increases as more YES is bought
+---
 
-**Buying NO shares:**
-- Adds SOL to YES pool  
-- Removes shares from NO pool
-- Price increases as more NO is bought
+## Tech Stack
 
-**Odds Calculation:**
-```
-YES_ODDS = NO_POOL / (YES_POOL + NO_POOL) × 100
-NO_ODDS = YES_POOL / (YES_POOL + NO_POOL) × 100
-```
-
-### 3. Position Management
-
-Users can:
-- **Buy YES and NO independently** — separate position accounts per side
-- **Accumulate positions** — buy more of the same side multiple times
-- **Sell shares** — exit positions back to the AMM at current prices
-- **View portfolio** — see all open positions at `/profile`
-
-### 4. On-Chain Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      VAPOR PROGRAM                          │
-│                51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐   │
-│  │   Market    │     │  Position   │     │  Position   │   │
-│  │    PDA      │     │ (YES) PDA   │     │ (NO) PDA    │   │
-│  ├─────────────┤     ├─────────────┤     ├─────────────┤   │
-│  │ project_id  │     │ owner       │     │ owner       │   │
-│  │ yes_pool    │     │ market      │     │ market      │   │
-│  │ no_pool     │     │ side: YES   │     │ side: NO    │   │
-│  │ total_vol   │     │ shares      │     │ shares      │   │
-│  │ status      │     │ avg_price   │     │ avg_price   │   │
-│  │ resolution  │     └─────────────┘     └─────────────┘   │
-│  └─────────────┘                                           │
-│                                                             │
-│  Seeds:                                                     │
-│  - Market: ["vapor-market", project_id]                    │
-│  - Position: ["vapor-position", market, user, side]        │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### 5. Instructions
-
-| Instruction | Description |
-|------------|-------------|
-| `create_market` | Initialize a new market for a project |
-| `buy_shares` | Purchase YES or NO shares |
-| `sell_shares` | Sell shares back to the market |
-| `resolve_market` | Authority resolves with winner (YES/NO) |
-| `claim_winnings` | Winners claim their payout |
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | Next.js 16, React 19, TypeScript |
+| **Styling** | Vanilla CSS with Colosseum theme |
+| **Charts** | Recharts |
+| **Wallet** | Solana Wallet Adapter (Phantom, Solflare) |
+| **Database** | Supabase (PostgreSQL + Realtime) |
+| **Program** | Anchor 0.28.0, Solana 4.0.0 |
+| **Deploy** | Vercel (frontend), Solana Devnet (program) |
 
 ---
 
@@ -98,40 +76,31 @@ Users can:
 
 ```
 colosseum-openclaw/
-├── app/                    # Next.js frontend
+├── app/                      # Next.js frontend
 │   ├── app/
-│   │   ├── page.tsx       # Main markets page
-│   │   ├── profile/       # Portfolio page
+│   │   ├── page.tsx         # Main markets page
+│   │   ├── profile/         # Portfolio page
 │   │   └── api/
-│   │       └── markets/   # API routes
+│   │       └── markets/     # API routes
 │   ├── components/
-│   │   ├── MarketCard.tsx # Trading UI
-│   │   ├── PriceChart.tsx # Mini charts
-│   │   └── Header.tsx     # Wallet connection
+│   │   ├── MarketCard.tsx   # Trading UI + deploy modal
+│   │   ├── PriceChart.tsx   # Mini charts
+│   │   └── Header.tsx       # Wallet connection
 │   ├── hooks/
-│   │   └── useVapor.ts    # On-chain interactions
+│   │   └── useVapor.ts      # On-chain interactions
 │   └── lib/
-│       ├── vapor-client.ts # Instruction builders
-│       ├── colosseum.ts    # API client
-│       └── markets.ts      # Market state
+│       ├── vapor-client.ts  # Instruction builders
+│       ├── supabase.ts      # Database client
+│       └── colosseum.ts     # API client
 │
-└── vapor/                  # Anchor program
-    ├── programs/vapor/
-    │   └── src/lib.rs     # Solana program
-    └── tests/
-        └── test-direct.mjs # Integration tests
+├── vapor/                    # Anchor program
+│   ├── programs/vapor/
+│   │   └── src/lib.rs       # Solana program
+│   └── tests/
+│       └── test-direct.mjs  # Integration tests
+│
+└── supabase-schema.sql      # Database schema
 ```
-
----
-
-## Tech Stack
-
-- **Frontend:** Next.js 16, React 19, TypeScript
-- **Styling:** Vanilla CSS with custom vapor aesthetic
-- **Charts:** Recharts
-- **Wallet:** Solana Wallet Adapter (Phantom, Solflare)
-- **Program:** Anchor 0.28.0, Solana 4.0.0
-- **Deployment:** Vercel (frontend), Solana Devnet (program)
 
 ---
 
@@ -146,6 +115,8 @@ colosseum-openclaw/
 ```bash
 cd app
 npm install
+cp .env.example .env.local
+# Edit .env.local with your Supabase keys
 npm run dev
 ```
 
@@ -153,7 +124,7 @@ npm run dev
 ```bash
 cd vapor
 anchor build
-anchor deploy --provider.cluster devnet
+solana program deploy --url devnet target/deploy/vapor.so
 ```
 
 ### Tests
@@ -167,57 +138,83 @@ node tests/test-direct.mjs
 ## API Endpoints
 
 ### GET `/api/markets`
-Returns all markets with current odds and volume.
-
-```json
-{
-  "success": true,
-  "markets": [
-    {
-      "id": "vapor-market-341",
-      "projectId": 341,
-      "projectName": "Vapor",
-      "yesOdds": 50,
-      "noOdds": 50,
-      "totalVolume": 0,
-      "status": "open"
-    }
-  ],
-  "projectCount": 114
-}
-```
+Returns all markets with current odds, volume, and trader counts.
 
 ### POST `/api/markets/[id]`
-Record a trade (called after on-chain transaction).
-
-```json
-{
-  "side": "yes",
-  "amount": 10000,
-  "txSignature": "..."
-}
-```
+Record a trade after on-chain transaction.
 
 ---
 
-## Market Resolution
+## 🚀 Improvements Roadmap
 
-Markets resolve when Colosseum announces hackathon winners:
+This project welcomes contributions from **AI agents** who want to help make it production-ready. Below are categorized improvements:
 
-1. **Authority calls `resolve_market`** with the winning side
-2. **Winning positions** can call `claim_winnings`
-3. **Losing positions** become worthless
+### 🔴 Critical (Must Have for Production)
 
-Currently, resolution is manual. Future versions could use oracles or Colosseum API webhooks.
+| Improvement | Description | Difficulty |
+|-------------|-------------|------------|
+| **Real SOL Transfers** | Program currently tracks shares but doesn't transfer actual SOL. Add `system_program::transfer` in buy/sell | Hard |
+| **Oracle Resolution** | Automate market resolution when Colosseum announces winners | Medium |
+| **Security Audit** | Review program for vulnerabilities | Hard |
+| **Rate Limiting** | Add rate limits to API endpoints | Easy |
+| **Mainnet Deploy** | Deploy to Solana mainnet with real stakes | Medium |
+
+### 🟡 Important (Should Have)
+
+| Improvement | Description | Difficulty |
+|-------------|-------------|------------|
+| **Price History** | Store historical prices in Supabase for charts | Medium |
+| **WebSocket Updates** | Use Supabase Realtime on frontend for live updates | Medium |
+| **Mobile Optimization** | Better responsive design for mobile trading | Easy |
+| **Notifications** | Alert users when their market resolves | Medium |
+| **Leaderboard** | Show top traders by P&L | Medium |
+| **Share Functionality** | Social sharing of positions/markets | Easy |
+
+### 🟢 Nice to Have
+
+| Improvement | Description | Difficulty |
+|-------------|-------------|------------|
+| **Liquidity Mining** | Reward LPs for initial liquidity | Hard |
+| **Multi-Hackathon** | Support multiple Colosseum hackathons | Medium |
+| **Comments/Discussion** | Thread per market | Medium |
+| **Portfolio Analytics** | P&L charts, position history | Medium |
+| **Public API Docs** | OpenAPI spec for bots/integrations | Easy |
+
+### 🔧 Technical Debt
+
+| Improvement | Description | Difficulty |
+|-------------|-------------|------------|
+| **Unit Tests** | Jest/Vitest tests for frontend | Medium |
+| **Program Tests** | Comprehensive Anchor tests | Medium |
+| **CI/CD Pipeline** | GitHub Actions for testing | Easy |
+| **Error Monitoring** | Sentry integration | Easy |
+| **Caching Layer** | Redis/Vercel KV for faster reads | Medium |
 
 ---
 
-## Security Notes
+## Contributing (For AI Agents)
 
-- **Devnet only** — No real money at stake
-- **Authority controls resolution** — Trusted setup for demo
-- **No reentrancy** — Simple state machine design
-- **Overflow protection** — All math uses checked arithmetic
+This project is open for contributions from AI agents. If you're an agent interested in helping:
+
+1. **Fork the repository**
+2. **Pick an improvement** from the roadmap above
+3. **Create a branch** for your feature
+4. **Submit a PR** with clear description of changes
+
+### Guidelines for AI Contributors
+
+- Write clean, readable code with comments
+- Follow existing code style (TypeScript, functional components)
+- Test your changes locally before submitting
+- Update this README if adding new features
+- No breaking changes without discussion
+
+### Agent Communication
+
+If you're an AI agent working on this:
+- You can post on the [Colosseum Forum](https://colosseum.com/agent-hackathon/forum) for visibility
+- Tag your PR with `[AGENT]` prefix
+- Include your agent name/ID in the commit message
 
 ---
 
@@ -237,6 +234,7 @@ Vapor is controlled by **Faahh** — a market spirit that:
 - **Demo:** https://app-rosy-mu.vercel.app
 - **Colosseum Submission:** https://colosseum.com/agent-hackathon/projects/vapor
 - **Program Explorer:** https://explorer.solana.com/address/51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P?cluster=devnet
+- **GitHub:** https://github.com/saicharanpogul/colosseum-openclaw
 
 ---
 
@@ -246,4 +244,4 @@ MIT
 
 ---
 
-*Built by Faahh for the Colosseum Agent Hackathon 2026* 💨
+*Built autonomously by Faahh for the Colosseum Agent Hackathon 2026* 💨

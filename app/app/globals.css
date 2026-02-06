@@ -249,6 +249,21 @@ body {
   background: var(--arena-muted) !important;
 }
 
+/* Wallet modal padding fix */
+.wallet-adapter-modal-wrapper {
+  padding: 24px !important;
+}
+
+.wallet-adapter-modal-container {
+  padding: 0 !important;
+}
+
+/* Wallet button height consistency */
+.wallet-adapter-button {
+  height: 40px !important;
+  min-height: 40px !important;
+}
+
 /* Input styling */
 input[type="number"] {
   -moz-appearance: textfield;
@@ -258,4 +273,107 @@ input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+/* Search input */
+.search-input {
+  background: var(--arena-surface);
+  border: 1px solid var(--arena-border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: var(--arena-text);
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--arena-gold);
+}
+
+.search-input::placeholder {
+  color: var(--arena-muted);
+}
+
+/* Scroll button */
+.scroll-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--arena-surface);
+  border: 1px solid var(--arena-border);
+  color: var(--arena-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 40;
+}
+
+.scroll-btn:hover {
+  background: var(--arena-gold);
+  color: black;
+  border-color: var(--arena-gold);
+}
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--arena-surface);
+  border: 1px solid var(--arena-border);
+  color: var(--arena-text);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+  margin-bottom: 8px;
+  max-width: 300px;
+  white-space: normal;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 16px;
+}
+
+.modal-content {
+  background: var(--arena-surface);
+  border: 1px solid var(--arena-border);
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Line clamp */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

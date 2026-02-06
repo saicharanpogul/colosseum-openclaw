@@ -268,10 +268,19 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
         </div>
       </div>
       
-      {/* Question */}
-      <p className="text-sm text-[var(--vapor-muted)] mb-3">
-        {market.question}
-      </p>
+      {/* Question - Fixed height with tooltip for overflow */}
+      <div className="relative group mb-3">
+        <p className="text-sm text-[var(--vapor-muted)] line-clamp-2 h-10">
+          {market.question}
+        </p>
+        {market.question.length > 80 && (
+          <div className="absolute left-0 right-0 bottom-full mb-2 hidden group-hover:block z-20">
+            <div className="bg-[var(--arena-surface)] border border-[var(--arena-border)] rounded-lg p-3 text-sm text-[var(--arena-text)] shadow-lg">
+              {market.question}
+            </div>
+          </div>
+        )}
+      </div>
       
       {/* Deployment Status - Highlighted */}
       {marketOnChain !== null && (
