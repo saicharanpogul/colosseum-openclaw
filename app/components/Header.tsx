@@ -11,12 +11,10 @@ export function Header() {
   const [balance, setBalance] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  // Handle hydration
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Fetch balance when connected
   useEffect(() => {
     if (!connected || !publicKey) {
       setBalance(null);
@@ -54,25 +52,28 @@ export function Header() {
     : '';
 
   return (
-    <header className="border-b border-[var(--vapor-border)] bg-[var(--vapor-surface)]/50 backdrop-blur-sm sticky top-0 z-50">
+    <header className="border-b border-[var(--arena-border)] bg-[var(--arena-surface)]/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-2xl font-bold gradient-text animate-float">
-              💨
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="text-2xl group-hover:scale-110 transition-transform">
+              🏛️
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">Vapor</h1>
-              <p className="text-xs text-[var(--vapor-muted)]">
+              <h1 className="text-xl font-bold gradient-text">Vapor</h1>
+              <p className="text-xs text-[var(--arena-muted)]">
                 Colosseum Prediction Markets
               </p>
             </div>
-          </div>
+          </Link>
           
+          {/* Right side */}
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--vapor-accent)]/10 border border-[var(--vapor-accent)]/30">
-              <div className="w-2 h-2 rounded-full bg-[var(--vapor-green)] animate-pulse" />
-              <span className="text-sm text-[var(--vapor-accent)]">Devnet</span>
+            {/* Devnet badge */}
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--arena-surface-alt)] border border-[var(--arena-border)]">
+              <div className="w-2 h-2 rounded-full bg-[var(--arena-green)] animate-pulse" />
+              <span className="text-sm text-[var(--arena-muted)]">Devnet</span>
             </div>
             
             {mounted && (
@@ -86,15 +87,15 @@ export function Header() {
                   </Link>
                   <FaucetButton />
                   {balance !== null && (
-                    <div className="hidden sm:block text-sm text-[var(--vapor-muted)]">
-                      <span className="text-[var(--vapor-accent)]">{balance.toFixed(2)}</span> SOL
+                    <div className="hidden sm:block text-sm text-[var(--arena-muted)]">
+                      <span className="text-[var(--arena-gold)]">{balance.toFixed(2)}</span> SOL
                     </div>
                   )}
                   <button
                     onClick={() => disconnect()}
                     className="vapor-button vapor-button-outline text-sm flex items-center gap-2"
                   >
-                    <span className="w-2 h-2 rounded-full bg-[var(--vapor-green)]" />
+                    <span className="w-2 h-2 rounded-full bg-[var(--arena-green)]" />
                     {shortAddress}
                   </button>
                 </div>

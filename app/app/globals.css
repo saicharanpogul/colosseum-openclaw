@@ -1,15 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --vapor-bg: #0a0a0f;
-  --vapor-surface: #12121a;
-  --vapor-border: #1e1e2e;
-  --vapor-accent: #6366f1;
-  --vapor-accent-glow: rgba(99, 102, 241, 0.3);
-  --vapor-green: #10b981;
-  --vapor-red: #ef4444;
-  --vapor-muted: #6b7280;
-  --vapor-text: #e5e7eb;
+  /* Colosseum-inspired theme */
+  --arena-bg: #0c0c0c;
+  --arena-surface: #141414;
+  --arena-surface-alt: #1a1a1a;
+  --arena-border: #2a2a2a;
+  --arena-gold: #d4a853;
+  --arena-gold-dim: #8b7355;
+  --arena-gold-glow: rgba(212, 168, 83, 0.3);
+  --arena-green: #22c55e;
+  --arena-red: #ef4444;
+  --arena-muted: #737373;
+  --arena-text: #fafafa;
+  --arena-text-dim: #a3a3a3;
+  
+  /* Legacy mappings */
+  --vapor-bg: var(--arena-bg);
+  --vapor-surface: var(--arena-surface);
+  --vapor-border: var(--arena-border);
+  --vapor-accent: var(--arena-gold);
+  --vapor-accent-glow: var(--arena-gold-glow);
+  --vapor-green: var(--arena-green);
+  --vapor-red: var(--arena-red);
+  --vapor-muted: var(--arena-muted);
+  --vapor-text: var(--arena-text);
 }
 
 * {
@@ -17,68 +32,81 @@
 }
 
 body {
-  background: var(--vapor-bg);
-  color: var(--vapor-text);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background: var(--arena-bg);
+  color: var(--arena-text);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Colosseum gradient background */
+.arena-gradient {
+  background: radial-gradient(ellipse at top, rgba(212, 168, 83, 0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at bottom, rgba(212, 168, 83, 0.04) 0%, transparent 50%),
+              var(--arena-bg);
 }
 
 /* Glow effects */
-.glow-accent {
-  box-shadow: 0 0 20px var(--vapor-accent-glow), 0 0 40px rgba(99, 102, 241, 0.1);
+.glow-gold {
+  box-shadow: 0 0 20px var(--arena-gold-glow), 0 0 40px rgba(212, 168, 83, 0.1);
 }
 
 .glow-green {
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
 }
 
 .glow-red {
   box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
 }
 
-/* Gradient text */
+/* Gradient text - Colosseum gold */
 .gradient-text {
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+  background: linear-gradient(135deg, #d4a853 0%, #f5d799 50%, #d4a853 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Card styling */
+/* Card styling - Arena stone look */
 .vapor-card {
-  background: var(--vapor-surface);
-  border: 1px solid var(--vapor-border);
+  background: var(--arena-surface);
+  border: 1px solid var(--arena-border);
   border-radius: 12px;
   transition: all 0.2s ease;
 }
 
 .vapor-card:hover {
-  border-color: var(--vapor-accent);
-  box-shadow: 0 0 30px var(--vapor-accent-glow);
+  border-color: var(--arena-gold-dim);
+  box-shadow: 0 0 30px var(--arena-gold-glow);
+}
+
+/* Featured card (Vapor) */
+.vapor-card.featured {
+  border-color: #f97316;
+  background: linear-gradient(135deg, var(--arena-surface) 0%, rgba(249, 115, 22, 0.05) 100%);
 }
 
 /* Progress bar for odds */
 .odds-bar {
-  height: 8px;
-  border-radius: 4px;
-  background: var(--vapor-border);
+  height: 6px;
+  border-radius: 3px;
+  background: var(--arena-border);
   overflow: hidden;
 }
 
 .odds-fill {
   height: 100%;
-  border-radius: 4px;
+  border-radius: 3px;
   transition: width 0.3s ease;
 }
 
 .odds-fill.yes {
-  background: linear-gradient(90deg, var(--vapor-green), #34d399);
+  background: linear-gradient(90deg, var(--arena-green), #4ade80);
 }
 
 .odds-fill.no {
-  background: linear-gradient(90deg, var(--vapor-red), #f87171);
+  background: linear-gradient(90deg, var(--arena-red), #f87171);
 }
 
-/* Button styles */
+/* Button styles - Arena aesthetic */
 .vapor-button {
   padding: 10px 20px;
   border-radius: 8px;
@@ -86,27 +114,42 @@ body {
   transition: all 0.2s ease;
   cursor: pointer;
   border: none;
+  font-size: 14px;
 }
 
 .vapor-button-primary {
-  background: var(--vapor-accent);
-  color: white;
+  background: linear-gradient(135deg, var(--arena-gold) 0%, #c49b4a 100%);
+  color: #0c0c0c;
+  font-weight: 600;
 }
 
 .vapor-button-primary:hover {
-  background: #818cf8;
-  box-shadow: 0 0 20px var(--vapor-accent-glow);
+  box-shadow: 0 0 20px var(--arena-gold-glow);
+  transform: translateY(-1px);
 }
 
 .vapor-button-outline {
   background: transparent;
-  border: 1px solid var(--vapor-border);
-  color: var(--vapor-text);
+  border: 1px solid var(--arena-border);
+  color: var(--arena-text);
 }
 
 .vapor-button-outline:hover {
-  border-color: var(--vapor-accent);
-  color: var(--vapor-accent);
+  border-color: var(--arena-gold);
+  color: var(--arena-gold);
+}
+
+/* Stats badge */
+.stats-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--arena-surface-alt);
+  border: 1px solid var(--arena-border);
+  color: var(--arena-text-dim);
 }
 
 /* Scrollbar */
@@ -115,16 +158,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--vapor-bg);
+  background: var(--arena-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--vapor-border);
+  background: var(--arena-border);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--vapor-muted);
+  background: var(--arena-muted);
 }
 
 /* Animations */
@@ -139,37 +182,38 @@ body {
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  50% { transform: translateY(-3px); }
 }
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Wallet Adapter Overrides */
+/* Wallet Adapter Overrides - Colosseum style */
 .wallet-adapter-button {
-  background: var(--vapor-accent) !important;
-  color: white !important;
+  background: linear-gradient(135deg, var(--arena-gold) 0%, #c49b4a 100%) !important;
+  color: #0c0c0c !important;
   border-radius: 8px !important;
   font-family: var(--font-geist-sans), system-ui, sans-serif !important;
   font-size: 14px !important;
+  font-weight: 600 !important;
   padding: 10px 20px !important;
   height: auto !important;
   transition: all 0.2s ease !important;
 }
 
 .wallet-adapter-button:hover {
-  background: #818cf8 !important;
-  box-shadow: 0 0 20px var(--vapor-accent-glow) !important;
+  box-shadow: 0 0 20px var(--arena-gold-glow) !important;
+  transform: translateY(-1px) !important;
 }
 
 .wallet-adapter-button-trigger {
-  background: var(--vapor-accent) !important;
+  background: linear-gradient(135deg, var(--arena-gold) 0%, #c49b4a 100%) !important;
 }
 
 .wallet-adapter-modal-wrapper {
-  background: var(--vapor-surface) !important;
-  border: 1px solid var(--vapor-border) !important;
+  background: var(--arena-surface) !important;
+  border: 1px solid var(--arena-border) !important;
   border-radius: 16px !important;
 }
 
@@ -183,24 +227,35 @@ body {
 }
 
 .wallet-adapter-modal-list li {
-  background: var(--vapor-bg) !important;
-  border: 1px solid var(--vapor-border) !important;
+  background: var(--arena-bg) !important;
+  border: 1px solid var(--arena-border) !important;
   border-radius: 8px !important;
   margin-bottom: 8px !important;
 }
 
 .wallet-adapter-modal-list li:hover {
-  border-color: var(--vapor-accent) !important;
+  border-color: var(--arena-gold) !important;
 }
 
 .wallet-adapter-modal-list-more {
-  color: var(--vapor-accent) !important;
+  color: var(--arena-gold) !important;
 }
 
 .wallet-adapter-modal-button-close {
-  background: var(--vapor-border) !important;
+  background: var(--arena-border) !important;
 }
 
 .wallet-adapter-modal-button-close:hover {
-  background: var(--vapor-muted) !important;
+  background: var(--arena-muted) !important;
+}
+
+/* Input styling */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
