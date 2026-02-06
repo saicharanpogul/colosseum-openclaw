@@ -260,31 +260,96 @@ export async function buildTransaction(
   return tx;
 }
 
-// Check if market exists on-chain
+// Check if market exists on-chain and parse its data
 export async function getMarketAccount(projectId: number): Promise<{
   exists: boolean;
   address: string;
-  data?: any;
+  data?: {
+    yesPool: number;
+    noPool: number;
+    totalVolume: number;
+  };
 }> {
   const [marketPDA] = deriveMarketPDA(projectId);
   
   try {
     const accountInfo = await connection.getAccountInfo(marketPDA);
     
-    if (!accountInfo) {
+    if (!accountInfo || accountInfo.data.length < 100) {
       return { exists: false, address: marketPDA.toBase58() };
     }
+    
+    // Parse market data (skip 8-byte discriminator)
+    // Layout: authority(32), project_id(8), project_name(4+64), yes_pool(8), no_pool(8), total_volume(8)
+    const data = new Uint8Array(accountInfo.data);
+    const offset = 8 + 32 + 8; // discriminator + authority + project_id
+    
+    // Skip project_name (4-byte length prefix + string)
+    const nameLen = readU32LE(data, offset);
+    const poolsOffset = offset + 4 + nameLen;
+    
+    const yesPool = readU64LE(data, poolsOffset);
+    const noPool = readU64LE(data, poolsOffset + 8);
+    const totalVolume = readU64LE(data, poolsOffset + 16);
     
     return { 
       exists: true, 
       address: marketPDA.toBase58(),
       data: {
-        raw: accountInfo.data,
+        yesPool,
+        noPool,
+        totalVolume,
       }
     };
   } catch (error) {
     return { exists: false, address: marketPDA.toBase58() };
   }
+}
+
+// Read LE u32 from Uint8Array
+function readU32LE(data: Uint8Array, offset: number): number {
+  return data[offset] | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24);
+}
+
+// Batch fetch multiple market accounts
+export async function getMultipleMarketAccounts(projectIds: number[]): Promise<Map<number, {
+  yesPool: number;
+  noPool: number;
+  totalVolume: number;
+}>> {
+  const results = new Map<number, { yesPool: number; noPool: number; totalVolume: number }>();
+  
+  // Derive all PDAs
+  const pdas = projectIds.map(id => ({ id, pda: deriveMarketPDA(id)[0] }));
+  
+  // Batch fetch (max 100 at a time)
+  const batchSize = 100;
+  for (let i = 0; i < pdas.length; i += batchSize) {
+    const batch = pdas.slice(i, i + batchSize);
+    try {
+      const accounts = await connection.getMultipleAccountsInfo(batch.map(p => p.pda));
+      
+      for (let j = 0; j < batch.length; j++) {
+        const accountInfo = accounts[j];
+        if (!accountInfo || accountInfo.data.length < 100) continue;
+        
+        const data = new Uint8Array(accountInfo.data);
+        const offset = 8 + 32 + 8; // discriminator + authority + project_id
+        const nameLen = readU32LE(data, offset);
+        const poolsOffset = offset + 4 + nameLen;
+        
+        results.set(batch[j].id, {
+          yesPool: readU64LE(data, poolsOffset),
+          noPool: readU64LE(data, poolsOffset + 8),
+          totalVolume: readU64LE(data, poolsOffset + 16),
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch batch:', error);
+    }
+  }
+  
+  return results;
 }
 
 // Get position for a user (for a specific side)

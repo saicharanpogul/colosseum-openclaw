@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { fetchProjects } from '@/lib/colosseum';
-import { syncMarketsFromProjects, getAllMarkets } from '@/lib/markets';
+import { syncMarketsFromProjects, getAllMarkets, getAllProjectIds, updateMarketsWithOnChainData } from '@/lib/markets';
 import { ColosseumProject } from '@/lib/types';
+import { getMultipleMarketAccounts } from '@/lib/vapor-client';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,13 @@ export async function GET() {
     // Sync markets with projects
     syncMarketsFromProjects(projects as ColosseumProject[]);
     
+    // Get all project IDs and fetch on-chain state
+    const projectIds = getAllProjectIds();
+    const onChainData = await getMultipleMarketAccounts(projectIds);
+    
+    // Update markets with on-chain data (pools, volume)
+    updateMarketsWithOnChainData(onChainData);
+    
     // Return all markets
     const markets = getAllMarkets();
     
@@ -20,6 +28,7 @@ export async function GET() {
       success: true,
       markets,
       projectCount: projects.length,
+      onChainCount: onChainData.size,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

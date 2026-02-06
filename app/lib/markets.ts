@@ -1,5 +1,5 @@
 // Simulated on-chain market state
-// In production, this would be stored on Solana via a program
+// Now syncs with actual on-chain data when available
 
 import { Market, ColosseumProject } from './types';
 import { deriveMarketPDA } from './solana';
@@ -156,4 +156,30 @@ export function getMarketStats() {
     resolvedMarkets: markets.filter(m => m.status === 'resolved').length,
     totalVolume: markets.reduce((sum, m) => sum + m.totalVolume, 0),
   };
+}
+
+// Update markets with on-chain state
+export function updateMarketsWithOnChainData(onChainData: Map<number, {
+  yesPool: number;
+  noPool: number;
+  totalVolume: number;
+}>): void {
+  for (const market of store.markets.values()) {
+    const chainData = onChainData.get(market.projectId);
+    if (chainData) {
+      market.yesPool = chainData.yesPool;
+      market.noPool = chainData.noPool;
+      market.totalVolume = chainData.totalVolume;
+      
+      // Recalculate odds
+      const odds = calculateOdds(chainData.yesPool, chainData.noPool);
+      market.yesOdds = odds.yesOdds;
+      market.noOdds = odds.noOdds;
+    }
+  }
+}
+
+// Get all project IDs
+export function getAllProjectIds(): number[] {
+  return Array.from(store.markets.values()).map(m => m.projectId);
 }
