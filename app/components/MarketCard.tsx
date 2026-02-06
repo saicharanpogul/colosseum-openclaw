@@ -180,10 +180,10 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
   const volumeInSol = (market.totalVolume / 1_000_000).toFixed(2);
   
   return (
-    <div className={`vapor-card p-6 ${isVaporProject ? 'ring-2 ring-[var(--vapor-accent)] relative' : ''}`}>
+    <div className={`vapor-card p-6 ${isVaporProject ? 'ring-2 ring-orange-500 relative' : ''}`}>
       {/* Vapor Badge */}
       {isVaporProject && (
-        <div className="absolute -top-2 -right-2 px-2 py-1 bg-[var(--vapor-accent)] text-black text-xs font-bold rounded-full">
+        <div className="absolute -top-2 -right-2 px-2 py-1 bg-orange-500 text-black text-xs font-bold rounded-full">
           💨 OUR PROJECT
         </div>
       )}

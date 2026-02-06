@@ -76,13 +76,22 @@ export function getMarket(id: string): Market | undefined {
 }
 
 export function getAllMarkets(): Market[] {
-  return Array.from(store.markets.values()).sort((a, b) => {
-    // Sort by total volume descending, then by upvotes
+  const markets = Array.from(store.markets.values());
+  
+  // Separate Vapor project and sort the rest
+  const vaporMarket = markets.find(m => m.projectId === 341 || m.projectName.toLowerCase() === 'vapor');
+  const otherMarkets = markets.filter(m => m.projectId !== 341 && m.projectName.toLowerCase() !== 'vapor');
+  
+  // Sort others by volume, then upvotes
+  otherMarkets.sort((a, b) => {
     if (b.totalVolume !== a.totalVolume) {
       return b.totalVolume - a.totalVolume;
     }
     return (b.upvotes || 0) - (a.upvotes || 0);
   });
+  
+  // Pin Vapor at top
+  return vaporMarket ? [vaporMarket, ...otherMarkets] : otherMarkets;
 }
 
 export function buyShares(
