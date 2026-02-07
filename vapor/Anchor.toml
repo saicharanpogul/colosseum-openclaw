@@ -5,7 +5,7 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-vapor = "51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P"
+vapor = "HsdG697s3bvayLkKZgK1M3F34susRMjF3KphrFdd6qRH"
 
 [programs.localnet]
 vapor = "GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLwmuzqp5Dqkbd"

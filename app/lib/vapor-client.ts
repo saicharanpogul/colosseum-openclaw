@@ -54,7 +54,7 @@ function readU64LE(data: Uint8Array, offset: number): number {
 }
 
 // Program constants
-export const VAPOR_PROGRAM_ID = new PublicKey('51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P');
+export const VAPOR_PROGRAM_ID = new PublicKey('HsdG697s3bvayLkKZgK1M3F34susRMjF3KphrFdd6qRH');
 export const MARKET_SEED = stringToBytes('vapor-market');
 export const POSITION_SEED = stringToBytes('vapor-position');
 

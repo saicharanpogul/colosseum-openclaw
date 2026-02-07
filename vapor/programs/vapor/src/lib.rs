@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P");
+declare_id!("HsdG697s3bvayLkKZgK1M3F34susRMjF3KphrFdd6qRH");
 
 #[program]
 pub mod vapor {
@@ -16,13 +16,24 @@ pub mod vapor {
     ) -> Result<()> {
         require!(project_name.len() <= 64, VaporError::NameTooLong);
         
+        // Transfer initial liquidity from user to market (optional: can be 0 or small)
+        // For now, we assume initial pools are virtual/math-only unless funded.
+        // But to make buys work with real SOL, we need a base.
+        // Let's keep it simple: Market starts with 0 SOL balance but logical pools.
+        
         let market = &mut ctx.accounts.market;
-        market.authority = ctx.accounts.authority.key();
+        // Set authority to the hardcoded oracle key, not the creator
+        // OR allow creator to be authority but only Faahh can deploy?
+        // Let's set it to the specific Oracle key provided.
+        market.authority = ORACLE_KEY;
+        
         market.project_id = project_id;
         market.project_name = project_name;
         market.yes_pool = INITIAL_LIQUIDITY;
         market.no_pool = INITIAL_LIQUIDITY;
         market.total_volume = 0;
+        market.net_sol_deposited = 0;
+        market.resolved_pot_size = 0;
         market.status = MarketStatus::Open;
         market.resolution = None;
         market.resolution_timestamp = resolution_timestamp;
@@ -32,7 +43,7 @@ pub mod vapor {
         emit!(MarketCreated {
             market: market.key(),
             project_id,
-            authority: ctx.accounts.authority.key(),
+            authority: market.authority,
         });
         
         Ok(())
@@ -50,6 +61,16 @@ pub mod vapor {
         let market = &mut ctx.accounts.market;
         require!(market.status == MarketStatus::Open, VaporError::MarketClosed);
         
+        // Transfer SOL from user to market PDA
+        let cpi_context = CpiContext::new(
+            ctx.accounts.system_program.to_account_info(),
+            anchor_lang::system_program::Transfer {
+                from: ctx.accounts.user.to_account_info(),
+                to: market.to_account_info(),
+            },
+        );
+        anchor_lang::system_program::transfer(cpi_context, amount)?;
+
         // Calculate shares using CPMM
         let shares = match side {
             Side::Yes => {
@@ -67,6 +88,7 @@ pub mod vapor {
         };
         
         market.total_volume = market.total_volume.checked_add(amount).ok_or(VaporError::Overflow)?;
+        market.net_sol_deposited = market.net_sol_deposited.checked_add(amount).ok_or(VaporError::Overflow)?;
         
         // Update or create position
         let position = &mut ctx.accounts.position;
@@ -130,6 +152,28 @@ pub mod vapor {
             }
         };
         
+        // Update net SOL deposited
+        market.net_sol_deposited = market.net_sol_deposited.checked_sub(payout).ok_or(VaporError::Overflow)?;
+
+        // Transfer SOL from market PDA to user
+        let project_id_bytes = market.project_id.to_le_bytes();
+        let seeds = &[
+            MARKET_SEED,
+            project_id_bytes.as_ref(),
+            &[market.bump],
+        ];
+        let signer = &[&seeds[..]];
+
+        let cpi_context = CpiContext::new_with_signer(
+            ctx.accounts.system_program.to_account_info(),
+            anchor_lang::system_program::Transfer {
+                from: market.to_account_info(),
+                to: ctx.accounts.user.to_account_info(),
+            },
+            signer,
+        );
+        anchor_lang::system_program::transfer(cpi_context, payout)?;
+
         // Reduce position
         position.shares = position.shares.checked_sub(shares_to_sell).ok_or(VaporError::Overflow)?;
         
@@ -158,6 +202,8 @@ pub mod vapor {
         
         market.status = MarketStatus::Resolved;
         market.resolution = Some(winner);
+        // Snapshot the pot size for payouts
+        market.resolved_pot_size = market.net_sol_deposited;
         
         emit!(MarketResolved {
             market: market.key(),
@@ -178,8 +224,47 @@ pub mod vapor {
         let winner = market.resolution.ok_or(VaporError::MarketNotResolved)?;
         require!(position.side == winner, VaporError::PositionLost);
         
-        // Calculate payout (simplified: 1 share = 1 token on win)
-        let payout = position.shares;
+        // Calculate payout
+        // Total shares outstanding for the winning side = Initial Liquidity - Current Liquidity
+        let total_shares_outstanding = match winner {
+            Side::Yes => INITIAL_LIQUIDITY.saturating_sub(market.yes_pool),
+            Side::No => INITIAL_LIQUIDITY.saturating_sub(market.no_pool),
+        };
+
+        if total_shares_outstanding == 0 {
+            // Should be impossible if user has > 0 shares
+            return Err(VaporError::Overflow.into());
+        }
+
+        // Payout = (User Shares / Total Winning Shares) * Net SOL Deposited at Resolution
+        // We use resolved_pot_size to ensure consistency even if market balance changes (rent, etc)
+        let payout = (position.shares as u128)
+            .checked_mul(market.resolved_pot_size as u128).ok_or(VaporError::Overflow)?
+            .checked_div(total_shares_outstanding as u128).ok_or(VaporError::Overflow)? as u64;
+            
+        require!(payout > 0, VaporError::InvalidAmount);
+
+        // Transfer SOL from market PDA to user
+        let project_id_bytes = market.project_id.to_le_bytes();
+        let seeds = &[
+            MARKET_SEED,
+            project_id_bytes.as_ref(),
+            &[market.bump],
+        ];
+        let signer = &[&seeds[..]];
+
+        // We use market.sub_lamports() logic via transfer instruction
+        // Note: CpiContext transfer requires the account to be mutable and signed.
+        // But market is a PDA, so we sign with seeds.
+        
+        let cpi_accounts = anchor_lang::system_program::Transfer {
+            from: market.to_account_info(),
+            to: ctx.accounts.user.to_account_info(),
+        };
+        let cpi_program = ctx.accounts.system_program.to_account_info();
+        let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
+        
+        anchor_lang::system_program::transfer(cpi_ctx, payout)?;
         
         // Mark position as claimed
         position.shares = 0;
@@ -199,6 +284,13 @@ pub mod vapor {
 pub const INITIAL_LIQUIDITY: u64 = 1_000_000; // 1M base units
 pub const MARKET_SEED: &[u8] = b"vapor-market";
 pub const POSITION_SEED: &[u8] = b"vapor-position";
+// Hardcoded authority (Faahh's wallet)
+pub const ORACLE_KEY: Pubkey = Pubkey::new_from_array([
+    248, 157, 189, 71, 37, 176, 34, 58,
+    198, 161, 84, 159, 9, 200, 44, 133,
+    207, 100, 130, 71, 34, 21, 105, 95,
+    4, 8, 141, 201, 102, 122, 201, 45
+]);
 
 // === Helper Functions ===
 
@@ -233,6 +325,8 @@ pub struct Market {
     pub yes_pool: u64,
     pub no_pool: u64,
     pub total_volume: u64,
+    pub net_sol_deposited: u64,
+    pub resolved_pot_size: u64, // Snapshot of pot at resolution
     pub status: MarketStatus,
     pub resolution: Option<Side>,
     pub resolution_timestamp: i64,
@@ -248,12 +342,14 @@ impl Market {
         8 + // yes_pool
         8 + // no_pool
         8 + // total_volume
+        8 + // net_sol_deposited
+        8 + // resolved_pot_size
         1 + // status
         2 + // resolution (Option<Side>)
         8 + // resolution_timestamp
         8 + // created_at
         1 + // bump
-        32; // padding
+        64; // padding
 }
 
 #[account]
@@ -348,11 +444,16 @@ pub struct SellShares<'info> {
         bump = position.bump
     )]
     pub position: Account<'info, Position>,
+    
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
 pub struct ResolveMarket<'info> {
-    #[account(mut)]
+    #[account(
+        mut,
+        address = ORACLE_KEY @ VaporError::Unauthorized
+    )]
     pub authority: Signer<'info>,
     
     #[account(mut)]
@@ -365,6 +466,7 @@ pub struct ClaimWinnings<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
     
+    #[account(mut)]
     pub market: Account<'info, Market>,
     
     #[account(
@@ -373,6 +475,8 @@ pub struct ClaimWinnings<'info> {
         bump = position.bump
     )]
     pub position: Account<'info, Position>,
+
+    pub system_program: Program<'info, System>,
 }
 
 // === Events ===
