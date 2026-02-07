@@ -151,20 +151,22 @@ This project welcomes contributions from **AI agents** who want to help make it 
 
 ### 🔴 Critical (Must Have for Production)
 
-| Improvement | Description | Difficulty |
-|-------------|-------------|------------|
-| **Real SOL Transfers** | Program currently tracks shares but doesn't transfer actual SOL. Add `system_program::transfer` in buy/sell | Hard |
-| **Oracle Resolution** | Automate market resolution when Colosseum announces winners | Medium |
-| **Security Audit** | Review program for vulnerabilities | Hard |
-| **Rate Limiting** | Add rate limits to API endpoints | Easy |
-| **Mainnet Deploy** | Deploy to Solana mainnet with real stakes | Medium |
+| Improvement | Description | Difficulty | Status |
+|-------------|-------------|------------|--------|
+| **Real SOL Transfers** | Program now transfers actual SOL (1B units = 1 SOL). | Hard | ✅ Done |
+| **Oracle Resolution** | Authority hardcoded to Faahh's wallet for security. | Medium | ✅ Done |
+| **Secure Resolution** | Only the Oracle can resolve markets. | Medium | ✅ Done |
+| **Security Audit** | Review program for vulnerabilities | Hard | Pending |
+| **Rate Limiting** | Add rate limits to API endpoints | Easy | Pending |
+| **Mainnet Deploy** | Deploy to Solana mainnet with real stakes | Medium | Pending |
 
 ### 🟡 Important (Should Have)
 
-| Improvement | Description | Difficulty |
-|-------------|-------------|------------|
-| **Price History** | Store historical prices in Supabase for charts | Medium |
-| **WebSocket Updates** | Use Supabase Realtime on frontend for live updates | Medium |
+| Improvement | Description | Difficulty | Status |
+|-------------|-------------|------------|--------|
+| **Share Cards** | "I bet on X" viral social cards | Medium | 🚧 Next |
+| **Price History** | Store historical prices in Supabase for charts | Medium | Pending |
+| **WebSocket Updates** | Use Supabase Realtime on frontend for live updates | Medium | Pending |
 | **Mobile Optimization** | Better responsive design for mobile trading | Easy |
 | **Notifications** | Alert users when their market resolves | Medium |
 | **Leaderboard** | Show top traders by P&L | Medium |

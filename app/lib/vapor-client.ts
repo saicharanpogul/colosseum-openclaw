@@ -2,6 +2,7 @@
 // Handles all on-chain interactions with the deployed Anchor program
 
 import { 
+  Connection,
   PublicKey, 
   Transaction, 
   SystemProgram,
