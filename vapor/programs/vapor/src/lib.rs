@@ -281,7 +281,7 @@ pub mod vapor {
 
 // === Constants ===
 
-pub const INITIAL_LIQUIDITY: u64 = 1_000_000; // 1M base units
+pub const INITIAL_LIQUIDITY: u64 = 1_000_000_000; // 1B lamports (1 SOL)
 pub const MARKET_SEED: &[u8] = b"vapor-market";
 pub const POSITION_SEED: &[u8] = b"vapor-position";
 // Hardcoded authority (Faahh's wallet)

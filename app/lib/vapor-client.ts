@@ -2,15 +2,18 @@
 // Handles all on-chain interactions with the deployed Anchor program
 
 import { 
-  Connection, 
   PublicKey, 
   Transaction, 
   SystemProgram,
   TransactionInstruction,
-  clusterApiUrl,
-  LAMPORTS_PER_SOL,
 } from '@solana/web3.js';
 import { Buffer } from 'buffer';
+import { 
+  connection, 
+  VAPOR_PROGRAM_ID, 
+  MARKET_SEED as MARKET_SEED_STR, 
+  POSITION_SEED as POSITION_SEED_STR,
+} from './solana';
 
 // Helper: Convert Uint8Array to Buffer for Solana SDK compatibility
 function toBuffer(arr: Uint8Array): Buffer {
@@ -53,16 +56,17 @@ function readU64LE(data: Uint8Array, offset: number): number {
   return Number(value);
 }
 
-// Program constants
-export const VAPOR_PROGRAM_ID = new PublicKey('HsdG697s3bvayLkKZgK1M3F34susRMjF3KphrFdd6qRH');
-export const MARKET_SEED = stringToBytes('vapor-market');
-export const POSITION_SEED = stringToBytes('vapor-position');
+// Read LE u32 from Uint8Array
+function readU32LE(data: Uint8Array, offset: number): number {
+  return data[offset] | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24);
+}
 
-// Devnet RPC endpoint
-const RPC_ENDPOINT = 'https://api.devnet.solana.com';
+// Program constants (derived from string seeds in solana.ts)
+export const MARKET_SEED = stringToBytes(MARKET_SEED_STR);
+export const POSITION_SEED = stringToBytes(POSITION_SEED_STR);
 
-// Devnet connection
-export const connection = new Connection(RPC_ENDPOINT, 'confirmed');
+// Export connection and ID from shared module
+export { connection, VAPOR_PROGRAM_ID };
 
 // Side enum matching the program
 export enum Side {
@@ -191,6 +195,7 @@ export function sellSharesInstruction(
       { pubkey: user, isSigner: true, isWritable: true },
       { pubkey: marketPDA, isSigner: false, isWritable: true },
       { pubkey: positionPDA, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
     ],
     programId: VAPOR_PROGRAM_ID,
     data: toBuffer(data),
@@ -235,6 +240,7 @@ export function claimWinningsInstruction(
       { pubkey: user, isSigner: true, isWritable: true },
       { pubkey: marketPDA, isSigner: false, isWritable: false },
       { pubkey: positionPDA, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
     ],
     programId: VAPOR_PROGRAM_ID,
     data: toBuffer(data),
@@ -306,11 +312,6 @@ export async function getMarketAccount(projectId: number): Promise<{
   }
 }
 
-// Read LE u32 from Uint8Array
-function readU32LE(data: Uint8Array, offset: number): number {
-  return data[offset] | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24);
-}
-
 // Batch fetch multiple market accounts
 export async function getMultipleMarketAccounts(projectIds: number[]): Promise<Map<number, {
   yesPool: number;
@@ -379,14 +380,14 @@ export async function getPositionAccount(
     // Parse position data (skip 8-byte discriminator)
     const data = new Uint8Array(accountInfo.data);
     // owner: 32, market: 32, side: 1, shares: 8, avg_price: 8, bump: 1
-    const side = data[8 + 32 + 32] as Side;
+    const sideVal = data[8 + 32 + 32] as Side;
     const shares = readU64LE(data, 8 + 32 + 32 + 1);
     const avgPrice = readU64LE(data, 8 + 32 + 32 + 1 + 8);
     
     return { 
       exists: shares > 0, 
       address: positionPDA.toBase58(),
-      data: { side, shares, avgPrice }
+      data: { side: sideVal, shares, avgPrice }
     };
   } catch (error) {
     return { exists: false, address: positionPDA.toBase58() };
@@ -403,11 +404,16 @@ export function estimateShares(
   const pool = side === Side.Yes ? yesPool : noPool;
   const oppositePool = side === Side.Yes ? noPool : yesPool;
   
-  const k = pool * oppositePool;
-  const newOpposite = oppositePool + amount;
+  // Calculate using BigInt for precision
+  const poolBig = BigInt(pool);
+  const oppositePoolBig = BigInt(oppositePool);
+  const amountBig = BigInt(amount);
+  
+  const k = poolBig * oppositePoolBig;
+  const newOpposite = oppositePoolBig + amountBig;
   const newPool = k / newOpposite;
   
-  return Math.floor(pool - newPool);
+  return Number(poolBig - newPool);
 }
 
 // Calculate odds from pools
@@ -421,14 +427,5 @@ export function calculateOdds(yesPool: number, noPool: number): { yes: number; n
   };
 }
 
-// Format program units to SOL (program uses micro-SOL: 1 SOL = 1_000_000 units)
-export const UNITS_PER_SOL = 1_000_000;
-
-export function lamportsToSol(units: number): number {
-  return units / UNITS_PER_SOL;
-}
-
-// Format SOL to program units
-export function solToLamports(sol: number): number {
-  return Math.floor(sol * UNITS_PER_SOL);
-}
+// Re-export helpers from solana.ts
+export { lamportsToSol, solToLamports } from './solana';

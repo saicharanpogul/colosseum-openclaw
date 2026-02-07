@@ -3,9 +3,20 @@
 
 import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
 
-const DEVNET_RPC = clusterApiUrl('devnet');
+// Fallback RPCs
+const RPC_ENDPOINTS = [
+  process.env.NEXT_PUBLIC_HELIUS_API_KEY ? `https://devnet.helius-rpc.com/?api-key=${process.env.NEXT_PUBLIC_HELIUS_API_KEY}` : null,
+  'https://api.devnet.solana.com',
+  clusterApiUrl('devnet')
+].filter(Boolean) as string[];
 
-export const connection = new Connection(DEVNET_RPC, 'confirmed');
+// Use first available RPC
+const endpoint = RPC_ENDPOINTS[0];
+
+export const connection = new Connection(endpoint, {
+  commitment: 'confirmed',
+  confirmTransactionInitialTimeout: 60000,
+});
 
 // Vapor Program ID (deployed on devnet)
 export const VAPOR_PROGRAM_ID = new PublicKey('HsdG697s3bvayLkKZgK1M3F34susRMjF3KphrFdd6qRH');
@@ -13,6 +24,16 @@ export const VAPOR_PROGRAM_ID = new PublicKey('HsdG697s3bvayLkKZgK1M3F34susRMjF3
 // Market PDA seeds
 export const MARKET_SEED = 'vapor-market';
 export const POSITION_SEED = 'vapor-position';
+
+export const UNITS_PER_SOL = 1_000_000_000; // 1 SOL = 1B lamports
+
+export function solToLamports(sol: number): number {
+  return Math.floor(sol * UNITS_PER_SOL);
+}
+
+export function lamportsToSol(lamports: number): number {
+  return lamports / UNITS_PER_SOL;
+}
 
 // AgentWallet config
 const AGENTWALLET_API = 'https://agentwallet.mcpay.tech/api';
