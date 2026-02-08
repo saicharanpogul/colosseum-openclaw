@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { StatsBar } from '@/components/StatsBar';
-import { MarketCard } from '@/components/MarketCardSimple';
+import { MarketCard } from '@/components/MarketCardQuick';
 import { PageSkeleton } from '@/components/LoadingSkeleton';
 import { Market, VaporStats } from '@/lib/types';
 
