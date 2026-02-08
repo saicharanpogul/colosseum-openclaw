@@ -57,8 +57,8 @@ export default function UpdatesPage() {
     <div className="min-h-screen vapor-bg">
       <Header />
       
-      <main className="container">
-        <div className="content-wrapper" style={{ maxWidth: '900px', margin: '0 auto' }}>
+      <main className="max-w-4xl mx-auto px-6 py-8">
+        <div>
           {/* Back link */}
           <Link href="/" className="back-link">
             ← Back to Markets

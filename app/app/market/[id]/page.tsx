@@ -140,28 +140,28 @@ export default function MarketDetailPage() {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="vapor-card p-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+            <div className="vapor-card p-3 md:p-4">
               <p className="text-xs text-[var(--arena-muted)] mb-1">YES Odds</p>
-              <p className="text-2xl font-bold text-[var(--arena-green)]">
+              <p className="text-xl md:text-2xl font-bold text-[var(--arena-green)]">
                 {market.yesOdds.toFixed(1)}%
               </p>
             </div>
-            <div className="vapor-card p-4">
+            <div className="vapor-card p-3 md:p-4">
               <p className="text-xs text-[var(--arena-muted)] mb-1">NO Odds</p>
-              <p className="text-2xl font-bold text-[var(--arena-red)]">
+              <p className="text-xl md:text-2xl font-bold text-[var(--arena-red)]">
                 {market.noOdds.toFixed(1)}%
               </p>
             </div>
-            <div className="vapor-card p-4">
+            <div className="vapor-card p-3 md:p-4">
               <p className="text-xs text-[var(--arena-muted)] mb-1">Volume</p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-xl md:text-2xl font-bold text-white">
                 {(market.totalVolume / 1_000_000).toFixed(2)} SOL
               </p>
             </div>
-            <div className="vapor-card p-4">
+            <div className="vapor-card p-3 md:p-4">
               <p className="text-xs text-[var(--arena-muted)] mb-1">Traders</p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-xl md:text-2xl font-bold text-white">
                 {market.participants || 0}
               </p>
             </div>

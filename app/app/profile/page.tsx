@@ -102,18 +102,18 @@ export default function ProfilePage() {
   }, 0);
   
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen arena-gradient">
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Your Portfolio</h1>
             <p className="text-[var(--vapor-muted)]">
               {connected ? `${publicKey?.toBase58().slice(0, 4)}...${publicKey?.toBase58().slice(-4)}` : 'Connect wallet to view'}
             </p>
           </div>
-          <Link href="/" className="vapor-button">
+          <Link href="/" className="vapor-button vapor-button-outline">
             ← Back to Markets
           </Link>
         </div>
