@@ -30,9 +30,10 @@
 - [ ] Accessibility basics (keyboard navigation, focus states)
 
 ### 2. Error Handling & User Feedback (CRITICAL)
-**Status:** After UI Polish
+**Status:** In Progress
 **Requirements:**
-- [ ] Toast notification system
+- [x] Toast notification system (completed!)
+- [ ] Integrate toasts into all error flows
 - [ ] Wallet connection error handling
 - [ ] Transaction failure messages with retry
 - [ ] Network error recovery
