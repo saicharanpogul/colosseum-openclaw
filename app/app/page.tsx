@@ -18,7 +18,7 @@ export default function Home() {
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Filter for deployed markets only (have market_address)
-  const deployedMarkets = markets.filter(m => m.marketAddress);
+  const deployedMarkets = markets.filter(m => m.marketAddress != null && m.marketAddress !== '');
 
   const stats: VaporStats = {
     totalMarkets: deployedMarkets.length,
