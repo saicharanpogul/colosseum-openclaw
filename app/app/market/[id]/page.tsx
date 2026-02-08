@@ -6,6 +6,7 @@ import { Header } from '@/components/Header';
 import { Market } from '@/lib/types';
 import { MarketCard } from '@/components/MarketCard';
 import { useToast } from '@/components/ToastProvider';
+import { PriceHistoryChart } from '@/components/PriceHistoryChart';
 
 export default function MarketDetailPage() {
   const params = useParams();
@@ -202,13 +203,10 @@ export default function MarketDetailPage() {
                   </div>
                 </div>
               </div>
-              
-              <div className="mt-4 p-4 bg-[var(--arena-surface-alt)] rounded-lg">
-                <p className="text-xs text-[var(--arena-text-dim)] text-center">
-                  💡 Odds update in real-time based on trades. Historical charts coming soon.
-                </p>
-              </div>
             </div>
+
+            {/* Price History Chart */}
+            <PriceHistoryChart marketId={marketId} />
 
             {/* Trading Card */}
             <div>
