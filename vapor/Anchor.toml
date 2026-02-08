@@ -8,7 +8,7 @@ skip-lint = false
 vapor = "HsdG697s3bvayLkKZgK1M3F34susRMjF3KphrFdd6qRH"
 
 [programs.localnet]
-vapor = "GM9Lqn33srkS4e3NgiuoAd2yx9h7cPBLwmuzqp5Dqkbd"
+vapor = "HsdG697s3bvayLkKZgK1M3F34susRMjF3KphrFdd6qRH"
 
 [registry]
 url = "https://api.apr.dev"

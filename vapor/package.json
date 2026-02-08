@@ -5,8 +5,9 @@
     "generate-volume": "node scripts/generate-volume-v3.js"
   },
   "dependencies": {
-    "@coral-xyz/anchor": "^0.32.1",
-    "@supabase/supabase-js": "^2.95.3"
+    "@coral-xyz/anchor": "^0.31.1",
+    "@supabase/supabase-js": "^2.95.3",
+    "borsh": "^2.0.0"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.0",
