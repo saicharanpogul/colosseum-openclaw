@@ -12,10 +12,8 @@ export async function GET(request: NextRequest) {
     const shares = searchParams.get('shares') || '0';
     const odds = searchParams.get('odds') || '50';
     const value = searchParams.get('value') || '0';
-    const wallet = searchParams.get('wallet') || '';
 
     const sideColor = side === 'yes' ? '#22c55e' : '#ef4444';
-    const sideBg = side === 'yes' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)';
 
     return new ImageResponse(
       (
@@ -28,130 +26,69 @@ export async function GET(request: NextRequest) {
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: '#0c0c0c',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
           }}
         >
-          {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '40px' }}>
-            <div style={{ fontSize: '60px', marginRight: '20px' }}>🏛️</div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#d4a853' }}>
-                Vapor
-              </div>
-              <div style={{ fontSize: '20px', color: '#737373' }}>
-                Colosseum Prediction Markets
-              </div>
-            </div>
-          </div>
-
-          {/* Main Card */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
-              backgroundColor: '#141414',
-              border: '2px solid #2a2a2a',
-              borderRadius: '24px',
-              padding: '48px 60px',
-              width: '900px',
+              alignItems: 'center',
+              gap: '20px',
             }}
           >
-            {/* Project Name */}
-            <div
-              style={{
-                fontSize: '40px',
-                fontWeight: 'bold',
-                color: '#fafafa',
-                marginBottom: '32px',
-                textAlign: 'center',
-              }}
-            >
+            <div style={{ fontSize: '60px', color: '#d4a853' }}>
+              Vapor 💨
+            </div>
+            
+            <div style={{ fontSize: '40px', fontWeight: 'bold', color: '#fafafa' }}>
               {projectName}
             </div>
 
-            {/* Position Badge */}
             <div
               style={{
-                display: 'flex',
-                justifyContent: 'center',
-                marginBottom: '32px',
+                padding: '20px 40px',
+                borderRadius: '12px',
+                backgroundColor: side === 'yes' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                border: `2px solid ${sideColor}`,
               }}
             >
-              <div
-                style={{
-                  backgroundColor: sideBg,
-                  border: `2px solid ${sideColor}`,
-                  borderRadius: '16px',
-                  padding: '16px 32px',
-                  fontSize: '32px',
-                  fontWeight: 'bold',
-                  color: sideColor,
-                  textTransform: 'uppercase',
-                }}
-              >
-                {side}
+              <div style={{ fontSize: '32px', fontWeight: 'bold', color: sideColor }}>
+                {side.toUpperCase()}
               </div>
             </div>
 
-            {/* Stats Grid */}
             <div
               style={{
                 display: 'flex',
-                justifyContent: 'space-around',
-                marginBottom: '32px',
+                gap: '40px',
+                marginTop: '20px',
               }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ fontSize: '20px', color: '#737373', marginBottom: '8px' }}>
-                  Shares
-                </div>
-                <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#fafafa' }}>
+                <div style={{ fontSize: '18px', color: '#737373' }}>Shares</div>
+                <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#fafafa' }}>
                   {shares}
                 </div>
               </div>
+
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ fontSize: '20px', color: '#737373', marginBottom: '8px' }}>
-                  Odds
-                </div>
-                <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#d4a853' }}>
+                <div style={{ fontSize: '18px', color: '#737373' }}>Odds</div>
+                <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#d4a853' }}>
                   {odds}%
                 </div>
               </div>
+
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ fontSize: '20px', color: '#737373', marginBottom: '8px' }}>
-                  Value
-                </div>
-                <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#d4a853' }}>
+                <div style={{ fontSize: '18px', color: '#737373' }}>Value</div>
+                <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#d4a853' }}>
                   {value} SOL
                 </div>
               </div>
             </div>
 
-            {/* Wallet */}
-            {wallet && (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  fontSize: '18px',
-                  color: '#737373',
-                }}
-              >
-                {wallet}
-              </div>
-            )}
-          </div>
-
-          {/* Footer */}
-          <div
-            style={{
-              display: 'flex',
-              marginTop: '40px',
-              fontSize: '20px',
-              color: '#737373',
-            }}
-          >
-            app-rosy-mu.vercel.app · Solana Devnet 💨
+            <div style={{ fontSize: '16px', color: '#737373', marginTop: '20px' }}>
+              app-rosy-mu.vercel.app
+            </div>
           </div>
         </div>
       ),
