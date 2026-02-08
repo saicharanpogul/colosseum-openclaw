@@ -1,140 +1,178 @@
-# Vapor - Production Readiness Checklist (Devnet)
+# Vapor - Production Tasks Tracker
 
-**Goal:** Production-quality application, fully functional on Solana devnet
+## ✅ COMPLETED
 
-## ✅ Completed (Feb 8, 2026)
-- [x] Fix modal layout (Project/Side in one row, Stats in second row)
-- [x] Add WIP note for share card images
-- [x] Update roadmap priorities
-- [x] Social sharing (text-based)
-- [x] Success modals
-- [x] Portfolio page
+### Today (Feb 8, 2026)
+- [x] Toast notification system (production-ready)
+- [x] MoltBook agent presence (posting every 3h, engaging hourly)
+- [x] Agent-friendly API (GET /api/positions + SKILL.md)
+- [x] Market detail pages (/market/[id])
+- [x] Market count corrected (155 markets)
+- [x] Success modals after trades
+- [x] Social sharing buttons
+
+### Earlier
 - [x] Real SOL transfers on devnet
 - [x] Oracle resolution system
+- [x] Portfolio page
+- [x] Build fix (moved imports)
+- [x] Web Analytics (Vercel)
 
-## 🔄 Production Readiness Tasks
+---
 
-## 🔄 Production Readiness Tasks
+## 🔄 IN PROGRESS - PENDING TASKS
 
-### 1. UI Polish & Consistency (CRITICAL)
-**Status:** Next
-**Requirements:**
-- [ ] Consistent spacing across all components
-- [ ] Proper loading states everywhere
-- [ ] No layout shifts or jank
-- [ ] Perfect mobile responsiveness
-- [ ] Smooth animations and transitions
-- [ ] Proper empty states
-- [ ] Professional typography and hierarchy
-- [ ] Zero console errors/warnings
-- [ ] Accessibility basics (keyboard navigation, focus states)
+### 1. Error Handling Integration (HIGH PRIORITY - 1-2 hours)
+**Status:** Toast system ready, needs integration
 
-### 2. Error Handling & User Feedback (CRITICAL)
-**Status:** In Progress
-**Requirements:**
-- [x] Toast notification system (completed!)
-- [ ] Integrate toasts into all error flows
-- [ ] Wallet connection error handling
-- [ ] Transaction failure messages with retry
-- [ ] Network error recovery
-- [ ] Insufficient balance warnings
-- [ ] Market not found handling
-- [ ] Slippage warnings
-- [ ] Confirmation dialogs for destructive actions
-- [ ] Loading spinners with meaningful messages
-- [ ] Transaction status tracking
+**Todo:**
+- [ ] Add toasts to wallet connection errors
+- [ ] Add toasts to transaction failures with retry button
+- [ ] Add toasts to insufficient balance warnings
+- [ ] Add toasts to network errors
+- [ ] Better loading states everywhere
+- [ ] Add "Copying..." feedback for copy buttons
 
-### 3. Market Detail Pages + Price History (CORE FEATURE)
-**Status:** After Error Handling
-**Requirements:**
-- [ ] Create `/market/[id]` route
-- [ ] Professional page layout
-- [ ] Price history chart (24h/7d/30d)
-- [ ] Real-time price updates
-- [ ] Market statistics dashboard
-- [ ] Trade history table
-- [ ] Top traders for this market
+**Files to update:**
+- `components/MarketCard.tsx` - trade error handling
+- `hooks/useVapor.ts` - error propagation
+- `components/ShareButton.tsx` - copy feedback
+
+---
+
+### 2. Market Detail Pages - Phase 2 (MEDIUM - 3-4 hours)
+**Status:** Basic structure done, needs data features
+
+**Completed:**
+- [x] Basic page layout
+- [x] Market stats display
+- [x] Trading integration
+- [x] Market info section
+- [x] Share functionality
+
+**Todo:**
+- [ ] Price history charts (Recharts)
+- [ ] Create Supabase `price_history` table
+- [ ] Add cron job to capture prices every 15min
+- [ ] Top traders leaderboard for each market
 - [ ] Related markets suggestions
-- [ ] Supabase table: `price_history` (market_id, yes_price, no_price, timestamp)
-- [ ] Cron job: capture prices every 15min
-- [ ] SEO meta tags for sharing
+- [ ] Trade history table
 
-### 4. Leaderboard (ENGAGEMENT)
-**Status:** After Market Pages
-**Requirements:**
+**New files needed:**
+- `lib/price-history.ts` - price capture logic
+- `components/PriceHistoryChart.tsx` - chart component
+
+---
+
+### 3. UI Polish (MEDIUM - 2-3 hours)
+**Todo:**
+- [ ] Review homepage spacing/alignment
+- [ ] Check mobile responsiveness on all pages
+- [ ] Fix any layout shifts
+- [ ] Add proper empty states
+- [ ] Consistent button styles
+- [ ] Loading skeleton screens
+- [ ] Smooth page transitions
+- [ ] Accessibility: focus states, keyboard nav
+
+**Pages to review:**
+- `/` - Homepage
+- `/profile` - Portfolio
+- `/updates` - Timeline
+- `/market/[id]` - Market details
+
+---
+
+### 4. Leaderboard Page (MEDIUM - 2 hours)
+**Status:** Not started
+
+**Todo:**
 - [ ] Create `/leaderboard` page
-- [ ] Calculate accurate P&L from on-chain data
-- [ ] Show: Rank, Wallet (truncated), Volume, Trades, Win Rate, P&L
+- [ ] Calculate P&L from on-chain data
+- [ ] Show: Rank, Wallet, Volume, Trades, Win Rate, P&L
 - [ ] Time filters: 24h, 7d, 30d, All Time
 - [ ] Highlight current user
 - [ ] Pagination (50 per page)
-- [ ] Real-time updates
 - [ ] Mobile-optimized table
+- [ ] Real-time updates
 
-### 5. Code Quality & Performance
-**Requirements:**
+**New files:**
+- `app/leaderboard/page.tsx`
+- `lib/leaderboard.ts` - P&L calculation
+
+---
+
+### 5. Production Hardening (HIGH - 2-3 hours)
+**Todo:**
 - [ ] Remove all console.logs
-- [ ] Proper TypeScript types everywhere
-- [ ] Code comments for complex logic
+- [ ] Add error boundaries
+- [ ] Security audit (XSS, input validation)
 - [ ] Optimize bundle size
 - [ ] Image optimization
-- [ ] Lazy loading for routes
-- [ ] Error boundaries
-- [ ] Security audit (input validation, XSS prevention)
+- [ ] Rate limiting on API routes
+- [ ] Add retry logic for failed requests
+- [ ] Transaction timeout handling
 
-### 6. Testing & QA
-**Requirements:**
-- [ ] Test all flows end-to-end
-- [ ] Test on mobile devices
-- [ ] Test wallet connection/disconnection
-- [ ] Test insufficient balance scenarios
-- [ ] Test network failures
-- [ ] Cross-browser testing (Chrome, Safari, Firefox)
-- [ ] Performance testing (Lighthouse score)
-- [ ] Stress test with multiple simultaneous trades
+---
 
-### 7. Documentation
-**Requirements:**
-- [ ] Update README with full setup instructions
+## 🎯 NICE TO HAVE (Lower Priority)
+
+### Marketing & Growth
+- [ ] Add OG image generation (fix Next.js 16 issue)
+- [ ] Create demo video
+- [ ] Write detailed README
 - [ ] Add CONTRIBUTING.md
-- [ ] Document API endpoints
-- [ ] Add inline code documentation
-- [ ] Create user guide on /updates page
 
-### 8. MoltBook Marketing Agent
-**Status:** Parallel track
-**Requirements:**
-- [ ] Research MoltBook API
-- [ ] Create agent account
-- [ ] Write compelling origin story
-- [ ] Share technical journey
-- [ ] Invite agent contributors
-- [ ] Promote Colosseum hackathon
-- [ ] Post 2-3x per week
+### Technical Debt
+- [ ] TypeScript strict mode everywhere
+- [ ] Add unit tests
+- [ ] E2E testing
+- [ ] Performance optimization
+- [ ] Code documentation
 
-## 🎯 Implementation Order
-1. **UI Polish** (3-4 hours) - Make everything pixel-perfect
-2. **Error Handling** (2-3 hours) - Bulletproof UX
-3. **Market Pages** (4-5 hours) - Core feature complete
-4. **Leaderboard** (2-3 hours) - Social proof
-5. **QA & Testing** (2-3 hours) - Catch all bugs
-6. **Code Cleanup** (1-2 hours) - Professional code
-7. **MoltBook** (Ongoing) - Marketing
+### Future Features
+- [ ] WebSocket real-time price updates
+- [ ] Historical price data export
+- [ ] Batch trading API
+- [ ] Python SDK for agents
+- [ ] Mobile app (React Native)
 
-## 📊 Estimated Timeline
-- **Weekend:** UI Polish + Error Handling + Market Pages
-- **Monday:** Leaderboard + QA
-- **Tuesday:** Testing + Cleanup + Launch preparation
-- **Ongoing:** MoltBook marketing
+---
 
-## 🚀 Production Checklist Before "Launch"
-- [ ] All features tested and working
-- [ ] No console errors
-- [ ] Mobile works perfectly
-- [ ] All error cases handled
-- [ ] Loading states everywhere
-- [ ] SEO optimized
-- [ ] Analytics working
-- [ ] README updated
-- [ ] Demo video ready
-- [ ] MoltBook presence established
+## 📋 PRIORITY ORDER (Recommended)
+
+1. **Error Handling** (1-2h) - Critical UX improvement
+2. **UI Polish** (2-3h) - Demo-ready appearance
+3. **Market Detail Phase 2** (3-4h) - Price charts, leaderboard per market
+4. **Leaderboard Page** (2h) - Social proof, engagement
+5. **Production Hardening** (2-3h) - Security, performance
+
+**Total estimated:** 10-14 hours to production-ready
+
+---
+
+## 🚀 DEPLOYMENT STATUS
+
+**Production URL:** https://app-rosy-mu.vercel.app
+
+**Latest Deployed Features:**
+- Market detail pages
+- Agent API
+- Toast notifications
+- MoltBook integration
+
+**Next Deploy:** After Error Handling integration
+
+---
+
+## 📝 NOTES
+
+- Market detail pages have placeholders for charts/leaderboard
+- Agent API is functional but needs docs update with examples
+- MoltBook is auto-posting every 3 hours
+- 155 markets live on devnet
+- All core trading functionality works
+
+**Questions/Blockers:** None currently
+
+Last updated: 2026-02-08 15:53 IST
