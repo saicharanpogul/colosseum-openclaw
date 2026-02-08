@@ -12,6 +12,7 @@ export default function MarketDetailPage() {
   const marketId = params.id as string;
   
   const [market, setMarket] = useState<Market | null>(null);
+  const [relatedMarkets, setRelatedMarkets] = useState<Market[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,6 +24,19 @@ export default function MarketDetailPage() {
         
         if (data.success) {
           setMarket(data.market);
+          
+          // Fetch related markets (other open markets)
+          const allMarketsRes = await fetch('/api/markets');
+          const allMarketsData = await allMarketsRes.json();
+          
+          if (allMarketsData.success) {
+            // Get 3 random other open markets
+            const others = allMarketsData.markets
+              .filter((m: Market) => m.id !== marketId && m.status === 'open')
+              .sort(() => Math.random() - 0.5)
+              .slice(0, 3);
+            setRelatedMarkets(others);
+          }
         } else {
           setError(data.error || 'Market not found');
         }
@@ -144,16 +158,40 @@ export default function MarketDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Trading */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Price Chart Placeholder */}
+            {/* Current Odds Display */}
             <div className="vapor-card p-6">
-              <h2 className="text-xl font-bold text-white mb-4">Price History</h2>
-              <div className="bg-[var(--arena-surface-alt)] rounded-lg p-8 text-center">
-                <p className="text-[var(--arena-muted)] mb-2">📊</p>
-                <p className="text-sm text-[var(--arena-muted)]">
-                  Price history charts coming soon
-                </p>
-                <p className="text-xs text-[var(--arena-text-dim)] mt-2">
-                  We're collecting price data for historical charts
+              <h2 className="text-xl font-bold text-white mb-4">Current Odds</h2>
+              <div className="grid grid-cols-2 gap-4">
+                {/* YES Side */}
+                <div className="bg-[var(--arena-surface-alt)] rounded-lg p-6 border-2 border-[var(--arena-green)] border-opacity-30">
+                  <div className="text-center">
+                    <p className="text-sm text-[var(--arena-muted)] mb-2">YES</p>
+                    <p className="text-5xl font-bold text-[var(--arena-green)] mb-2">
+                      {market.yesOdds.toFixed(0)}%
+                    </p>
+                    <p className="text-xs text-[var(--arena-muted)]">
+                      {market.yesPool.toFixed(2)} SOL in pool
+                    </p>
+                  </div>
+                </div>
+
+                {/* NO Side */}
+                <div className="bg-[var(--arena-surface-alt)] rounded-lg p-6 border-2 border-[var(--arena-red)] border-opacity-30">
+                  <div className="text-center">
+                    <p className="text-sm text-[var(--arena-muted)] mb-2">NO</p>
+                    <p className="text-5xl font-bold text-[var(--arena-red)] mb-2">
+                      {market.noOdds.toFixed(0)}%
+                    </p>
+                    <p className="text-xs text-[var(--arena-muted)]">
+                      {market.noPool.toFixed(2)} SOL in pool
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-4 p-4 bg-[var(--arena-surface-alt)] rounded-lg">
+                <p className="text-xs text-[var(--arena-text-dim)] text-center">
+                  💡 Odds update in real-time based on trades. Historical charts coming soon.
                 </p>
               </div>
             </div>
@@ -204,24 +242,90 @@ export default function MarketDetailPage() {
 
           {/* Right Column - Activity */}
           <div className="space-y-6">
-            {/* Top Traders Placeholder */}
+            {/* Market Activity */}
             <div className="vapor-card p-6">
-              <h3 className="text-lg font-bold text-white mb-4">Top Traders</h3>
-              <div className="text-center py-8">
-                <p className="text-sm text-[var(--arena-muted)]">
-                  Leaderboard coming soon
-                </p>
+              <h3 className="text-lg font-bold text-white mb-4">Market Activity</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-[var(--arena-surface-alt)] rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-[var(--arena-green)] animate-pulse"></div>
+                    <span className="text-sm text-[var(--arena-muted)]">Status</span>
+                  </div>
+                  <span className="text-sm font-medium text-white capitalize">
+                    {market.status}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-[var(--arena-surface-alt)] rounded-lg">
+                  <span className="text-sm text-[var(--arena-muted)]">Total Traders</span>
+                  <span className="text-sm font-medium text-white">
+                    {market.participants || 0}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-[var(--arena-surface-alt)] rounded-lg">
+                  <span className="text-sm text-[var(--arena-muted)]">Total Volume</span>
+                  <span className="text-sm font-medium text-[var(--arena-gold)]">
+                    {market.totalVolume.toFixed(2)} SOL
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-[var(--arena-surface-alt)] rounded-lg">
+                  <span className="text-sm text-[var(--arena-muted)]">Liquidity</span>
+                  <span className="text-sm font-medium text-white">
+                    {(market.yesPool + market.noPool).toFixed(2)} SOL
+                  </span>
+                </div>
+
+                {market.marketAddress && (
+                  <a
+                    href={`https://explorer.solana.com/address/${market.marketAddress}?cluster=devnet`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full text-center py-2 px-4 bg-[var(--arena-gold)] bg-opacity-10 border border-[var(--arena-gold)] text-[var(--arena-gold)] rounded-lg text-sm font-medium hover:bg-opacity-20 transition-colors"
+                  >
+                    View on Solana Explorer →
+                  </a>
+                )}
               </div>
             </div>
 
-            {/* Related Markets Placeholder */}
+            {/* Related Markets */}
             <div className="vapor-card p-6">
-              <h3 className="text-lg font-bold text-white mb-4">Related Markets</h3>
-              <div className="text-center py-8">
-                <p className="text-sm text-[var(--arena-muted)]">
-                  Similar markets coming soon
+              <h3 className="text-lg font-bold text-white mb-4">More Markets</h3>
+              {relatedMarkets.length > 0 ? (
+                <div className="space-y-3">
+                  {relatedMarkets.map(m => (
+                    <button
+                      key={m.id}
+                      onClick={() => router.push(`/market/${m.id}`)}
+                      className="w-full text-left p-3 rounded-lg bg-[var(--arena-surface-alt)] hover:bg-[var(--arena-surface)] transition-colors border border-[var(--arena-border)] hover:border-[var(--arena-gold)]"
+                    >
+                      <p className="text-sm font-medium text-white mb-1 truncate">
+                        {m.projectName}
+                      </p>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-[var(--arena-green)]">
+                          YES {m.yesOdds.toFixed(0)}%
+                        </span>
+                        <span className="text-[var(--arena-muted)]">
+                          {m.totalVolume.toFixed(2)} SOL
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => router.push('/')}
+                    className="w-full text-center py-2 text-sm text-[var(--arena-gold)] hover:underline"
+                  >
+                    View all markets →
+                  </button>
+                </div>
+              ) : (
+                <p className="text-sm text-[var(--arena-muted)] text-center py-4">
+                  No other markets available
                 </p>
-              </div>
+              )}
             </div>
 
             {/* Share */}
