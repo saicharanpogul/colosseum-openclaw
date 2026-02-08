@@ -2,7 +2,7 @@
     "scripts": {
         "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
         "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
-        "generate-volume": "ts-node scripts/generate-volume.ts"
+        "generate-volume": "node scripts/generate-volume.js"
     },
     "dependencies": {
         "@coral-xyz/anchor": "^0.29.0"
