@@ -73,37 +73,25 @@ export function Header() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-3">
-              {/* Leaderboard Link */}
+              {/* Navigation Links */}
               <Link
                 href="/leaderboard"
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--arena-surface-alt)] border border-[var(--arena-border)] text-sm text-[var(--arena-muted)] hover:border-[var(--arena-gold)] hover:text-[var(--arena-gold)] transition-colors"
+                className="text-sm text-[var(--arena-muted)] hover:text-[var(--arena-gold)] transition-colors font-medium"
               >
-                <span>🏆</span>
-                <span>Leaderboard</span>
+                🏆 Leaderboard
               </Link>
               
-              {/* Updates Link */}
               <Link
                 href="/updates"
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--arena-surface-alt)] border border-[var(--arena-border)] text-sm text-[var(--arena-muted)] hover:border-[var(--arena-gold)] hover:text-[var(--arena-gold)] transition-colors"
+                className="text-sm text-[var(--arena-muted)] hover:text-[var(--arena-gold)] transition-colors font-medium"
               >
-                <span>📜</span>
-                <span>Updates</span>
+                📜 Updates
               </Link>
               
-              {/* Contribute CTA */}
-              <button
-                onClick={() => setShowContributeModal(true)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--arena-surface-alt)] border border-[var(--arena-border)] text-sm text-[var(--arena-muted)] hover:border-[var(--arena-gold)] hover:text-[var(--arena-gold)] transition-colors"
-              >
-                <span>🤖</span>
-                <span>AI Agents: Contribute</span>
-              </button>
-              
               {/* Devnet badge */}
-              <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-[var(--arena-surface-alt)] border border-[var(--arena-border)]">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--arena-surface-alt)] border border-[var(--arena-border)]">
                 <div className="w-2 h-2 rounded-full bg-[var(--arena-green)] animate-pulse" />
-                <span className="text-sm text-[var(--arena-muted)]">Devnet</span>
+                <span className="text-xs text-[var(--arena-muted)]">Devnet</span>
               </div>
               
               {mounted && (
@@ -111,22 +99,23 @@ export function Header() {
                   <div className="flex items-center gap-3">
                     <Link 
                       href="/profile"
-                      className="vapor-button vapor-button-outline text-sm h-10 flex items-center"
+                      className="text-sm text-[var(--arena-muted)] hover:text-[var(--arena-gold)] transition-colors font-medium"
                     >
                       Portfolio
                     </Link>
                     <FaucetButton />
                     {balance !== null && (
-                      <div className="text-sm text-[var(--arena-muted)]">
-                        <span className="text-[var(--arena-gold)]">{balance.toFixed(2)}</span> SOL
+                      <div className="text-sm font-medium">
+                        <span className="text-[var(--arena-gold)]">{balance.toFixed(2)}</span>
+                        <span className="text-[var(--arena-muted)] ml-1">SOL</span>
                       </div>
                     )}
                     <button
                       onClick={() => disconnect()}
-                      className="vapor-button vapor-button-outline text-sm h-10 flex items-center gap-2"
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--arena-surface-alt)] border border-[var(--arena-border)] text-sm hover:border-[var(--arena-gold)] transition-colors"
                     >
                       <span className="w-2 h-2 rounded-full bg-[var(--arena-green)]" />
-                      {shortAddress}
+                      <span className="text-white">{shortAddress}</span>
                     </button>
                   </div>
                 ) : (

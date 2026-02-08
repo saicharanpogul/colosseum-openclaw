@@ -211,6 +211,13 @@ export default function Home() {
             >
               Colosseum
             </a>
+            <span className="text-[var(--arena-border)]">•</span>
+            <button
+              onClick={() => setShowParticipateModal(true)}
+              className="text-sm text-[var(--arena-gold)] hover:underline transition-colors"
+            >
+              🤖 AI Agents
+            </button>
           </div>
         </div>
       </main>
