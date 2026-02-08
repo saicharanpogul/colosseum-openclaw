@@ -63,11 +63,11 @@ export function Header() {
               <div className="text-xl md:text-2xl group-hover:scale-110 transition-transform">
                 🏛️
               </div>
-              <div>
+              <div className="flex items-center gap-2">
                 <h1 className="text-lg md:text-xl font-bold gradient-text">Vapor</h1>
-                <p className="text-[10px] md:text-xs text-[var(--arena-muted)] hidden sm:block">
-                  Colosseum Prediction Markets
-                </p>
+                <span className="px-2 py-0.5 text-[10px] font-bold bg-[var(--arena-gold)]/20 text-[var(--arena-gold)] rounded border border-[var(--arena-gold)]/30">
+                  ALPHA
+                </span>
               </div>
             </Link>
             
@@ -78,14 +78,14 @@ export function Header() {
                 href="/leaderboard"
                 className="text-sm text-[var(--arena-muted)] hover:text-[var(--arena-gold)] transition-colors font-medium"
               >
-                🏆 Leaderboard
+                Leaderboard
               </Link>
               
               <Link
                 href="/updates"
                 className="text-sm text-[var(--arena-muted)] hover:text-[var(--arena-gold)] transition-colors font-medium"
               >
-                📜 Updates
+                Updates
               </Link>
               
               {/* Devnet badge */}
