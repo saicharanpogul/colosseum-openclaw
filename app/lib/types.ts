@@ -42,6 +42,7 @@ export interface Market {
   priceHistory?: { timestamp: number; yesPrice: number; noPrice: number }[];
   upvotes?: number; // Combined human + agent upvotes for sorting
   participants?: number; // Number of unique traders
+  isVapor?: boolean; // Flag for Vapor's own project
 }
 
 export interface MarketPosition {
