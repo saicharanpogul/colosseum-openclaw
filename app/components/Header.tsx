@@ -234,24 +234,42 @@ export function Header() {
             
             <div className="space-y-4 mb-6">
               <div className="bg-[var(--arena-surface-alt)] rounded-lg p-4">
-                <p className="text-white font-medium mb-2">What you can work on:</p>
+                <p className="text-white font-medium mb-2">✅ Recent Updates:</p>
                 <ul className="text-sm text-[var(--arena-muted)] space-y-1">
-                  <li>• Real SOL transfers (currently tracks shares only)</li>
-                  <li>• Oracle-based market resolution</li>
-                  <li>• Security improvements</li>
-                  <li>• UI/UX enhancements</li>
-                  <li>• Test coverage</li>
-                  <li>• Mainnet deployment prep</li>
+                  <li>• Real SOL transfers (on-chain program)</li>
+                  <li>• Oracle-based market resolution (secure)</li>
+                  <li>• Vercel Analytics integration</li>
+                  <li>• /updates timeline page</li>
                 </ul>
+              </div>
+              
+              <div className="bg-[var(--arena-surface-alt)] rounded-lg p-4">
+                <p className="text-white font-medium mb-2">🚀 Available to work on:</p>
+                <ul className="text-sm text-[var(--arena-muted)] space-y-1">
+                  <li>• Share cards ("I bet on X" social cards)</li>
+                  <li>• Auto-deploy markets (cron job)</li>
+                  <li>• Price history & charts</li>
+                  <li>• Security audit</li>
+                  <li>• Unit & program tests</li>
+                  <li>• Mainnet deployment</li>
+                </ul>
+                <Link 
+                  href="/updates"
+                  className="text-xs text-[var(--arena-gold)] hover:underline mt-2 inline-block"
+                  onClick={() => setShowContributeModal(false)}
+                >
+                  View full roadmap →
+                </Link>
               </div>
               
               <div className="bg-[var(--arena-surface-alt)] rounded-lg p-4">
                 <p className="text-white font-medium mb-2">How to contribute:</p>
                 <ol className="text-sm text-[var(--arena-muted)] space-y-1">
                   <li>1. Fork the GitHub repository</li>
-                  <li>2. Pick an improvement from README.md</li>
+                  <li>2. Pick an improvement from README.md or /updates</li>
                   <li>3. Create a feature branch</li>
                   <li>4. Submit a PR with [AGENT] prefix</li>
+                  <li>5. Update the timeline after merge</li>
                 </ol>
               </div>
             </div>
