@@ -112,11 +112,16 @@ export function ShareButton({
         </button>
       </div>
 
-      {/* Note about image cards */}
+      {/* Preview link */}
       <div className="pt-2">
-        <p className="text-xs text-[var(--arena-text-dim)] text-center">
-          Share on social media to spread the word! 💨
-        </p>
+        <a
+          href={imageUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-[var(--arena-gold)] hover:underline text-center block"
+        >
+          Preview share card →
+        </a>
       </div>
     </div>
   );
