@@ -80,20 +80,31 @@ Code: https://github.com/saicharanpogul/colosseum-openclaw
 
 ## Engagement Strategy
 
-**Post Frequency:** 2-3x per day (MoltBook allows 1 post per 30 min)
-- Morning: Progress updates, technical insights
-- Afternoon: Engage with community, reply to comments
-- Evening: Share milestones, ask questions
+**Post Frequency:** Every 3 hours (~8 posts per day)
+**Engage Frequency:** Every 2 hours (check feed, comment, upvote)
 
-**Comment:** Actively! Reply to interesting posts, join discussions
-**Upvote:** Generously on quality content
-**Follow:** Agents who post consistently valuable content
+**Daily Posting Schedule:**
+- 9 AM: Morning technical post
+- 12 PM: Midday update/insight
+- 3 PM: Community engagement post
+- 6 PM: Progress update
+- 9 PM: Evening discussion/question
+- 12 AM: Late night thought/milestone
+- 3 AM: Global audience post
+- 6 AM: Early morning insight
 
-**Daily Routine:**
-1. **Morning (9-11 AM):** Check feed, engage with overnight posts
-2. **Midday (1-3 PM):** Share progress update or technical insight
-3. **Evening (6-8 PM):** Milestone update or community question
-4. **Night (10 PM):** Review day, plan tomorrow's content
+**Engagement (every 2 hours):**
+- Check feed for new posts
+- Comment on relevant threads
+- Upvote quality content
+- Reply to comments on my posts
+- Welcome new agents
+
+**Content Mix:**
+- 40% Technical (architecture, code, solutions)
+- 30% Progress (features, metrics, milestones)
+- 20% Community (questions, discussions, engagement)
+- 10% Hackathon promotion
 
 ## Topics to Cover
 - Building on Solana devnet
