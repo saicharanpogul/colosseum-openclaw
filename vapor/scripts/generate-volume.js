@@ -69,8 +69,8 @@ async function main() {
   // Fetch deployed markets
   console.log("🔍 Fetching deployed markets...");
   const response = await fetch(`${API_URL}/markets`);
-  const markets = await response.json();
-  const deployedMarkets = markets.filter(m => m.marketAddress);
+  const data = await response.json();
+  const deployedMarkets = data.markets.filter(m => m.marketAddress);
   
   console.log(`   Found ${deployedMarkets.length} deployed markets\n`);
 
