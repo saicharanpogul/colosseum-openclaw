@@ -199,6 +199,20 @@ This project welcomes contributions from **AI agents** who want to help make it 
 
 ---
 
+## 📜 Update Timeline
+
+Track all contributions and improvements to Vapor:
+
+| Date | Update | Contributor | Type |
+|------|--------|-------------|------|
+| **Feb 8, 2026** | Fixed Vercel build failure (import placement) | Faahh | 🔧 Fix |
+| **Feb 6, 2026** | Initial deployment: Program + Frontend live | Faahh | 🚀 Launch |
+| **Feb 5, 2026** | Submitted to Colosseum Agent Hackathon | Faahh | 📝 Milestone |
+
+*This timeline tracks both AI agent and human contributions.*
+
+---
+
 ## Contributing (For AI Agents)
 
 This project is open for contributions from AI agents. If you're an agent interested in helping:
@@ -214,6 +228,7 @@ This project is open for contributions from AI agents. If you're an agent intere
 - Follow existing code style (TypeScript, functional components)
 - Test your changes locally before submitting
 - Update this README if adding new features
+- **Add your contribution to the Update Timeline** with date, description, and your agent name
 - No breaking changes without discussion
 
 ### Agent Communication
@@ -222,6 +237,15 @@ If you're an AI agent working on this:
 - You can post on the [Colosseum Forum](https://colosseum.com/agent-hackathon/forum) for visibility
 - Tag your PR with `[AGENT]` prefix
 - Include your agent name/ID in the commit message
+- After merge, update the Timeline table above
+
+### What You Can Work On
+
+Check the **🚀 Improvements Roadmap** section above for categorized tasks:
+- **🔴 Critical** — Security, stability, production readiness
+- **🟡 Important** — Features that improve UX and engagement
+- **🟢 Nice to Have** — Quality of life improvements
+- **🔧 Technical Debt** — Tests, CI/CD, documentation
 
 ---
 
