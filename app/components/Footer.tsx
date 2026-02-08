@@ -2,7 +2,7 @@
 
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-[var(--arena-border)]">
+    <footer className="mt-auto border-t border-[var(--arena-border)] bg-[var(--arena-surface)]">
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="text-center">
           <p className="text-sm text-[var(--arena-muted)] mb-4">
