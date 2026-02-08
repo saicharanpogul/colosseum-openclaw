@@ -303,8 +303,11 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
         </div>
       )}
       
-      {/* Header */}
-      <div className="flex items-start justify-between mb-2">
+      {/* Header - Clickable to view details */}
+      <div 
+        className="flex items-start justify-between mb-2 cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={() => router.push(`/market/${market.id}`)}
+      >
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-white mb-1">
             {market.projectName}

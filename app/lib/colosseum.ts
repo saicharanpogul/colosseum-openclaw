@@ -41,7 +41,7 @@ export async function fetchProjects(includeDrafts = false): Promise<any[]> {
     }
   }
   
-  console.log(`Fetched ${allProjects.length} projects from Colosseum`);
+  // console.log(`Fetched ${allProjects.length} projects from Colosseum`);
   return allProjects;
 }
 

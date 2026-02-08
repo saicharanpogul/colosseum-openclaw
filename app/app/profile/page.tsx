@@ -44,16 +44,16 @@ export default function ProfilePage() {
   // Fetch positions efficiently
   const fetchAllPositions = useCallback(async () => {
     if (!connected || !publicKey || markets.length === 0) {
-      console.log('Profile: Skipping fetch', { connected, hasPublicKey: !!publicKey, marketCount: markets.length });
+      // console.log('Profile: Skipping fetch', { connected, hasPublicKey: !!publicKey, marketCount: markets.length });
       return;
     }
     
     setLoading(true);
     
     try {
-      console.log('Profile: Fetching positions for', publicKey.toBase58());
+      // console.log('Profile: Fetching positions for', publicKey.toBase58());
       const userPositions = await getAllPositions();
-      console.log('Profile: Raw positions from chain:', userPositions);
+      // console.log('Profile: Raw positions from chain:', userPositions);
       
       const displayPositions: PositionDisplay[] = [];
       
@@ -61,7 +61,7 @@ export default function ProfilePage() {
         // Find market info by address
         const market = markets.find(m => m.marketAddress === pos.marketAddress);
         
-        console.log('Profile: Looking for market', pos.marketAddress, 'found:', !!market);
+        // console.log('Profile: Looking for market', pos.marketAddress, 'found:', !!market);
         
         if (market) {
           displayPositions.push({
@@ -83,7 +83,7 @@ export default function ProfilePage() {
         }
       }
       
-      console.log('Profile: Display positions:', displayPositions);
+      // console.log('Profile: Display positions:', displayPositions);
       setPositions(displayPositions);
     } catch (err) {
       console.error('Failed to fetch positions:', err);

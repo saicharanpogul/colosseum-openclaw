@@ -111,7 +111,7 @@ export function useVapor(): UseVaporResult {
       
       const existing = await getMarketAccount(projectId);
       if (existing.exists) {
-        console.log('Market already exists on-chain, syncing...');
+        // console.log('Market already exists on-chain, syncing...');
         return { signature: null, address: marketAddress };
       }
 
@@ -135,7 +135,7 @@ export function useVapor(): UseVaporResult {
       // Handle "Account already in use" error (RPC consistency issue)
       const msg = err.message || JSON.stringify(err);
       if (msg.includes('already in use') || msg.includes('custom program error: 0x0')) {
-        console.log('Market exists (caught via tx error), syncing...');
+        // console.log('Market exists (caught via tx error), syncing...');
         const [marketPDA] = deriveMarketPDA(projectId);
         setLoading(false);
         return { signature: null, address: marketPDA.toBase58() };
