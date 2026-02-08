@@ -132,7 +132,7 @@ async function main() {
       const traderProgram = new anchor.Program(idl, PROGRAM_ID, traderProvider);
 
       await traderProgram.methods
-        .buyShares(side, new anchor.BN(amountLamports), positionBump)
+        .buy_shares(side, new anchor.BN(amountLamports), positionBump)
         .accounts({
           market: marketPubkey,
           position: positionPda,
