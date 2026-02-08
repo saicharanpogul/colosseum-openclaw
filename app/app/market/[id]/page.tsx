@@ -5,10 +5,12 @@ import { useParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Market } from '@/lib/types';
 import { MarketCard } from '@/components/MarketCard';
+import { useToast } from '@/components/ToastProvider';
 
 export default function MarketDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { showToast } = useToast();
   const marketId = params.id as string;
   
   const [market, setMarket] = useState<Market | null>(null);
@@ -22,8 +24,15 @@ export default function MarketDetailPage() {
         const res = await fetch(`/api/markets/${marketId}`);
         const data = await res.json();
         
-        if (data.success) {
-          setMarket(data.market);
+        if (data.success && data.market) {
+          // Ensure all required fields exist
+          const marketData = {
+            ...data.market,
+            projectSlug: data.market.projectSlug || data.market.projectName?.toLowerCase().replace(/\s+/g, '-') || '',
+            createdAt: data.market.createdAt || new Date().toISOString(),
+            question: data.market.question || `Will ${data.market.projectName} win?`,
+          };
+          setMarket(marketData);
           
           // Fetch related markets (other open markets)
           const allMarketsRes = await fetch('/api/markets');
@@ -40,8 +49,8 @@ export default function MarketDetailPage() {
         } else {
           setError(data.error || 'Market not found');
         }
-      } catch (err) {
-        setError('Failed to load market');
+      } catch (err: any) {
+        setError(err.message || 'Failed to load market');
       } finally {
         setLoading(false);
       }
@@ -142,7 +151,7 @@ export default function MarketDetailPage() {
             <div className="vapor-card p-4">
               <p className="text-xs text-[var(--arena-muted)] mb-1">Volume</p>
               <p className="text-2xl font-bold text-white">
-                {market.totalVolume.toFixed(2)} SOL
+                {(market.totalVolume / 1_000_000).toFixed(2)} SOL
               </p>
             </div>
             <div className="vapor-card p-4">
@@ -170,7 +179,7 @@ export default function MarketDetailPage() {
                       {market.yesOdds.toFixed(0)}%
                     </p>
                     <p className="text-xs text-[var(--arena-muted)]">
-                      {market.yesPool.toFixed(2)} SOL in pool
+                      {(market.yesPool / 1_000_000).toFixed(2)} SOL in pool
                     </p>
                   </div>
                 </div>
@@ -183,7 +192,7 @@ export default function MarketDetailPage() {
                       {market.noOdds.toFixed(0)}%
                     </p>
                     <p className="text-xs text-[var(--arena-muted)]">
-                      {market.noPool.toFixed(2)} SOL in pool
+                      {(market.noPool / 1_000_000).toFixed(2)} SOL in pool
                     </p>
                   </div>
                 </div>
@@ -266,14 +275,14 @@ export default function MarketDetailPage() {
                 <div className="flex items-center justify-between p-3 bg-[var(--arena-surface-alt)] rounded-lg">
                   <span className="text-sm text-[var(--arena-muted)]">Total Volume</span>
                   <span className="text-sm font-medium text-[var(--arena-gold)]">
-                    {market.totalVolume.toFixed(2)} SOL
+                    {(market.totalVolume / 1_000_000).toFixed(2)} SOL
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between p-3 bg-[var(--arena-surface-alt)] rounded-lg">
                   <span className="text-sm text-[var(--arena-muted)]">Liquidity</span>
                   <span className="text-sm font-medium text-white">
-                    {(market.yesPool + market.noPool).toFixed(2)} SOL
+                    {((market.yesPool + market.noPool) / 1_000_000).toFixed(2)} SOL
                   </span>
                 </div>
 
@@ -309,7 +318,7 @@ export default function MarketDetailPage() {
                           YES {m.yesOdds.toFixed(0)}%
                         </span>
                         <span className="text-[var(--arena-muted)]">
-                          {m.totalVolume.toFixed(2)} SOL
+                          {(m.totalVolume / 1_000_000).toFixed(2)} SOL
                         </span>
                       </div>
                     </button>
@@ -346,6 +355,7 @@ export default function MarketDetailPage() {
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(`https://app-rosy-mu.vercel.app/market/${marketId}`);
+                    showToast('Link copied to clipboard!', 'success');
                   }}
                   className="w-full vapor-button vapor-button-outline"
                 >
