@@ -123,19 +123,19 @@ export default function MarketDetailPage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              {market.status === 'open' && (
-                <span className="px-3 py-1 rounded-full bg-[var(--arena-green)]/10 border border-[var(--arena-green)] text-[var(--arena-green)] text-sm font-medium">
-                  Open
+              {market.marketAddress ? (
+                <span className="px-3 py-1 rounded-full bg-[var(--arena-green)]/10 border border-[var(--arena-green)] text-[var(--arena-green)] text-sm font-medium flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--arena-green)]"></span>
+                  Live Trading
+                </span>
+              ) : (
+                <span className="px-3 py-1 rounded-full bg-[var(--arena-muted)]/10 border border-[var(--arena-border)] text-[var(--arena-muted)] text-sm font-medium">
+                  Not Deployed
                 </span>
               )}
               {market.status === 'resolved' && (
                 <span className="px-3 py-1 rounded-full bg-[var(--arena-gold)]/10 border border-[var(--arena-gold)] text-[var(--arena-gold)] text-sm font-medium">
                   Resolved
-                </span>
-              )}
-              {(!market.status || (market.status !== 'open' && market.status !== 'resolved')) && (
-                <span className="px-3 py-1 rounded-full bg-[var(--arena-muted)]/10 border border-[var(--arena-border)] text-[var(--arena-muted)] text-sm font-medium">
-                  Unknown
                 </span>
               )}
             </div>
