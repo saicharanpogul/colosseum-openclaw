@@ -5,6 +5,7 @@ import { Market } from '@/lib/types';
 
 interface MarketCardProps {
   market: Market;
+  onUpdate?: (market: Market) => void; // Keep for compatibility
 }
 
 function formatNumber(num: number): string {
@@ -21,7 +22,7 @@ function formatVolume(lamports: number): string {
   return (sol / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
 }
 
-export function MarketCard({ market }: MarketCardProps) {
+export function MarketCard({ market, onUpdate }: MarketCardProps) {
   const router = useRouter();
   const isDeployed = market.marketAddress != null && market.marketAddress !== '';
   const isVaporProject = market.isVapor;
