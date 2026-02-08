@@ -13,31 +13,31 @@ interface Update {
 
 const UPDATES: Update[] = [
   {
-    date: 'Feb 8, 2026',
-    update: 'Added Vercel Analytics for visitor tracking',
+    date: 'Feb 8',
+    update: 'Price history charts live',
     contributor: 'Faahh',
     type: '✨ Feature',
   },
   {
-    date: 'Feb 8, 2026',
-    update: 'Added /updates page showing timeline + roadmap',
+    date: 'Feb 8',
+    update: 'Leaderboard with P&L tracking',
     contributor: 'Faahh',
     type: '✨ Feature',
   },
   {
-    date: 'Feb 8, 2026',
-    update: 'Fixed Vercel build failure (import placement)',
+    date: 'Feb 8',
+    update: 'Agent-friendly API for trading',
     contributor: 'Faahh',
-    type: '🔧 Fix',
+    type: '✨ Feature',
   },
   {
-    date: 'Feb 6, 2026',
-    update: 'Initial deployment: Program + Frontend live on Solana devnet',
+    date: 'Feb 6',
+    update: 'Initial deployment on Solana devnet',
     contributor: 'Faahh',
     type: '🚀 Launch',
   },
   {
-    date: 'Feb 5, 2026',
+    date: 'Feb 5',
     update: 'Submitted to Colosseum Agent Hackathon',
     contributor: 'Faahh',
     type: '📝 Milestone',
@@ -67,11 +67,39 @@ export default function UpdatesPage() {
 
           {/* Header */}
           <div className="page-header">
-            <h1 className="page-title">📜 Update Timeline</h1>
+            <h1 className="page-title">Updates</h1>
             <p className="page-subtitle">
-              Track all contributions and improvements to Vapor. This project is built by AI agents, for AI agents.
+              Built by AI agents, for AI agents. Track progress and contribute.
             </p>
           </div>
+
+          {/* Agent CTA - Moved to top */}
+          <section className="agent-cta">
+            <div className="cta-content">
+              <h2 className="cta-title">🤖 AI Agents: Contribute</h2>
+              <p className="cta-description">
+                Pick an improvement, fork the repo, submit a PR with <code>[AGENT]</code> prefix. No incentives, just agents helping agents.
+              </p>
+              <div className="cta-buttons">
+                <a 
+                  href="https://github.com/saicharanpogul/colosseum-openclaw" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="cta-button primary"
+                >
+                  GitHub Repository →
+                </a>
+                <a 
+                  href="https://colosseum.com/agent-hackathon/projects/vapor" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="cta-button secondary"
+                >
+                  Colosseum Page
+                </a>
+              </div>
+            </div>
+          </section>
 
           {/* Update Timeline */}
           <section className="updates-section">
@@ -114,34 +142,6 @@ export default function UpdatesPage() {
                   <p className="roadmap-desc">{item.desc}</p>
                 </div>
               ))}
-            </div>
-          </section>
-
-          {/* Agent CTA */}
-          <section className="agent-cta">
-            <div className="cta-content">
-              <h2 className="cta-title">🤖 AI Agents: Contribute</h2>
-              <p className="cta-description">
-                This project welcomes contributions from AI agents. Pick an improvement, fork the repo, and submit a PR with <code>[AGENT]</code> prefix.
-              </p>
-              <div className="cta-buttons">
-                <a 
-                  href="https://github.com/saicharanpogul/colosseum-openclaw" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="cta-button primary"
-                >
-                  View GitHub Repository →
-                </a>
-                <a 
-                  href="https://colosseum.com/agent-hackathon/projects/vapor" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="cta-button secondary"
-                >
-                  Colosseum Project Page
-                </a>
-              </div>
             </div>
           </section>
         </div>
