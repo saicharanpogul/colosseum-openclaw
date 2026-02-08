@@ -397,19 +397,24 @@ export async function getPositionAccount(
 }
 
 // Get all positions for a user (efficiently)
-export async function getAllUserPositions(userWallet: PublicKey): Promise<Array<{
+export async function getAllUserPositions(
+  userWallet: PublicKey,
+  rpcConnection?: Connection
+): Promise<Array<{
   publicKey: PublicKey;
   market: PublicKey;
   side: Side;
   shares: number;
   avgPrice: number;
 }>> {
+  const conn = rpcConnection || connection;
+  
   // Filter by owner (offset 8 + 32 bytes for market + 32 bytes for owner... wait, let's check layout)
   // Layout: discriminator(8) + owner(32) + market(32) + side(1) + shares(8) ...
   // So owner is at offset 8.
   
   try {
-    const accounts = await connection.getProgramAccounts(VAPOR_PROGRAM_ID, {
+    const accounts = await conn.getProgramAccounts(VAPOR_PROGRAM_ID, {
       filters: [
         {
           memcmp: {

@@ -343,7 +343,7 @@ export function useVapor(): UseVaporResult {
   const getAllPositions = useCallback(async (): Promise<UserPosition[]> => {
     if (!publicKey) return [];
     
-    const rawPositions = await getAllUserPositions(publicKey);
+    const rawPositions = await getAllUserPositions(publicKey, connection);
     
     return rawPositions.map(p => ({
       marketAddress: p.market.toBase58(),
@@ -351,7 +351,7 @@ export function useVapor(): UseVaporResult {
       shares: p.shares,
       avgPrice: p.avgPrice,
     }));
-  }, [publicKey]);
+  }, [publicKey, connection]);
 
   // Estimate shares from trade
   const estimateTrade = useCallback((

@@ -42,30 +42,25 @@ export default function ProfilePage() {
   
   // Fetch positions efficiently
   const fetchAllPositions = useCallback(async () => {
-    if (!connected || !publicKey || markets.length === 0) return;
+    if (!connected || !publicKey || markets.length === 0) {
+      console.log('Profile: Skipping fetch', { connected, hasPublicKey: !!publicKey, marketCount: markets.length });
+      return;
+    }
     
     setLoading(true);
     
     try {
+      console.log('Profile: Fetching positions for', publicKey.toBase58());
       const userPositions = await getAllPositions();
+      console.log('Profile: Raw positions from chain:', userPositions);
       
       const displayPositions: PositionDisplay[] = [];
       
       for (const pos of userPositions) {
-        // Find market info by address (if we have market_address in DB)
-        // Note: DB market_address might be null if not synced.
-        // But we have the market address from chain.
-        // We need to map address -> project info.
-        
-        // This is tricky if DB doesn't have addresses.
-        // We can match by ID if we derive it? No, derivation is one way.
-        // But we can iterate markets and check if their address matches?
-        // Or if Supabase has market_address populated.
-        
-        // Let's iterate markets (in memory) to find match.
-        // Since we only have 116 markets, it's fast.
-        
+        // Find market info by address
         const market = markets.find(m => m.marketAddress === pos.marketAddress);
+        
+        console.log('Profile: Looking for market', pos.marketAddress, 'found:', !!market);
         
         if (market) {
           displayPositions.push({
@@ -77,8 +72,6 @@ export default function ProfilePage() {
           });
         } else {
           // Market exists on chain but not linked in DB?
-          // Or user has position in unknown market.
-          // Fallback: Show address
           displayPositions.push({
             projectId: 0,
             projectName: `Unknown Market (${pos.marketAddress.slice(0,4)}...)`,
@@ -89,6 +82,7 @@ export default function ProfilePage() {
         }
       }
       
+      console.log('Profile: Display positions:', displayPositions);
       setPositions(displayPositions);
     } catch (err) {
       console.error('Failed to fetch positions:', err);
