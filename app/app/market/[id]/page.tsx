@@ -122,17 +122,17 @@ export default function MarketDetailPage() {
             </div>
             <div className="flex items-center gap-2">
               {market.status === 'open' && (
-                <span className="px-3 py-1 rounded-full bg-[var(--arena-green)] bg-opacity-20 border border-[var(--arena-green)] text-[var(--arena-green)] text-sm font-medium">
+                <span className="px-3 py-1 rounded-full bg-[var(--arena-green)]/10 border border-[var(--arena-green)] text-[var(--arena-green)] text-sm font-medium">
                   Open
                 </span>
               )}
               {market.status === 'resolved' && (
-                <span className="px-3 py-1 rounded-full bg-[var(--arena-gold)] bg-opacity-20 border border-[var(--arena-gold)] text-[var(--arena-gold)] text-sm font-medium">
+                <span className="px-3 py-1 rounded-full bg-[var(--arena-gold)]/10 border border-[var(--arena-gold)] text-[var(--arena-gold)] text-sm font-medium">
                   Resolved
                 </span>
               )}
               {(!market.status || (market.status !== 'open' && market.status !== 'resolved')) && (
-                <span className="px-3 py-1 rounded-full bg-[var(--arena-muted)] bg-opacity-20 border border-[var(--arena-border)] text-[var(--arena-muted)] text-sm font-medium">
+                <span className="px-3 py-1 rounded-full bg-[var(--arena-muted)]/10 border border-[var(--arena-border)] text-[var(--arena-muted)] text-sm font-medium">
                   Unknown
                 </span>
               )}
