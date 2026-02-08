@@ -177,7 +177,7 @@ export default function MarketDetailPage() {
               <h2 className="text-xl font-bold text-white mb-4">Current Odds</h2>
               <div className="grid grid-cols-2 gap-4">
                 {/* YES Side */}
-                <div className="bg-[var(--arena-surface-alt)] rounded-lg p-6 border-2 border-[var(--arena-green)] border-opacity-30">
+                <div className="bg-[var(--arena-surface-alt)] rounded-lg p-6 border-2 border-[var(--arena-green)]/30">
                   <div className="text-center">
                     <p className="text-sm text-[var(--arena-muted)] mb-2">YES</p>
                     <p className="text-5xl font-bold text-[var(--arena-green)] mb-2">
@@ -190,7 +190,7 @@ export default function MarketDetailPage() {
                 </div>
 
                 {/* NO Side */}
-                <div className="bg-[var(--arena-surface-alt)] rounded-lg p-6 border-2 border-[var(--arena-red)] border-opacity-30">
+                <div className="bg-[var(--arena-surface-alt)] rounded-lg p-6 border-2 border-[var(--arena-red)]/30">
                   <div className="text-center">
                     <p className="text-sm text-[var(--arena-muted)] mb-2">NO</p>
                     <p className="text-5xl font-bold text-[var(--arena-red)] mb-2">
@@ -297,7 +297,7 @@ export default function MarketDetailPage() {
                     href={`https://explorer.solana.com/address/${market.marketAddress}?cluster=devnet`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block w-full text-center py-2 px-4 bg-[var(--arena-gold)] bg-opacity-10 border border-[var(--arena-gold)] text-[var(--arena-gold)] rounded-lg text-sm font-medium hover:bg-opacity-20 transition-colors"
+                    className="block w-full text-center py-2 px-4 bg-[var(--arena-gold)]/10 border border-[var(--arena-gold)] text-[var(--arena-gold)] rounded-lg text-sm font-medium hover:bg-[var(--arena-gold)]/20 transition-colors"
                   >
                     View on Solana Explorer →
                   </a>

@@ -113,7 +113,7 @@ export default function LeaderboardPage() {
                         <tr
                           key={entry.wallet}
                           className={`border-b border-[var(--arena-border)] hover:bg-[var(--arena-surface-alt)] transition-colors ${
-                            isUser ? 'bg-[var(--arena-gold)] bg-opacity-10' : ''
+                            isUser ? 'bg-[var(--arena-gold)]/10' : ''
                           }`}
                         >
                           <td className="p-4">
@@ -170,7 +170,7 @@ export default function LeaderboardPage() {
                       key={entry.wallet}
                       className={`p-4 rounded-lg border ${
                         isUser 
-                          ? 'bg-[var(--arena-gold)] bg-opacity-10 border-[var(--arena-gold)]' 
+                          ? 'bg-[var(--arena-gold)]/10 border-[var(--arena-gold)]' 
                           : 'bg-[var(--arena-surface-alt)] border-[var(--arena-border)]'
                       }`}
                     >
