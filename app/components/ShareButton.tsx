@@ -24,11 +24,6 @@ export function ShareButton({
   const [copied, setCopied] = useState(false);
 
   const shareUrl = `https://app-rosy-mu.vercel.app/?project=${projectId}`;
-  const imageUrl = `https://app-rosy-mu.vercel.app/api/share?project=${encodeURIComponent(
-    projectName
-  )}&side=${side}&shares=${shares.toFixed(4)}&odds=${odds}&value=${value.toFixed(
-    4
-  )}&wallet=${wallet || ''}`;
 
   const shareText = `I just ${side === 'yes' ? 'backed' : 'bet against'} "${projectName}" on Vapor 💨\n\n${shares.toFixed(
     4
@@ -50,7 +45,7 @@ export function ShareButton({
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(`${shareText}\n\nShare card: ${imageUrl}`);
+      await navigator.clipboard.writeText(shareText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -110,18 +105,6 @@ export function ShareButton({
             </>
           )}
         </button>
-      </div>
-
-      {/* Preview link */}
-      <div className="pt-2">
-        <a
-          href={imageUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-[var(--arena-gold)] hover:underline text-center block"
-        >
-          Preview share card →
-        </a>
       </div>
     </div>
   );
