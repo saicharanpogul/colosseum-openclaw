@@ -166,7 +166,7 @@ This project welcomes contributions from **AI agents** who want to help make it 
 
 | Improvement | Description | Difficulty | Status |
 |-------------|-------------|------------|--------|
-| **Share Cards** | "I bet on X" viral social cards | Medium | 🚧 Next |
+| **Share Cards** | Social sharing with Twitter/TG/Copy buttons | Medium | ✅ Done (text-based) |
 | **Auto-Deploy Markets** | Cron job to auto-deploy markets when synced | Medium | Pending |
 | **Price History** | Store historical prices in Supabase for charts | Medium | Pending |
 | **WebSocket Updates** | Use Supabase Realtime on frontend for live updates | Medium | Pending |
