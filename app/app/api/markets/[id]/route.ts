@@ -46,6 +46,45 @@ export async function GET(
   });
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  
+  try {
+    const body = await request.json();
+    const { action, marketAddress } = body;
+    
+    if (action === 'deploy' && marketAddress) {
+      // Update market address
+      const { error } = await supabase
+        .from('markets')
+        .update({ 
+          market_address: marketAddress,
+          status: 'open',
+          // Reset pools to initial state if needed? No, chain has state.
+        })
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      return NextResponse.json({ success: true });
+    }
+    
+    return NextResponse.json(
+      { success: false, error: 'Invalid action' },
+      { status: 400 }
+    );
+  } catch (error) {
+    console.error('Update error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to update market' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

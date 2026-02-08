@@ -14,6 +14,7 @@ import {
   buildTransaction,
   getMarketAccount,
   getPositionAccount,
+  getAllUserPositions,
   Side,
   estimateShares,
   solToLamports,
@@ -25,6 +26,13 @@ export interface PositionData {
   shares: number;
 }
 
+export interface UserPosition {
+  marketAddress: string;
+  side: 'yes' | 'no';
+  shares: number;
+  avgPrice: number;
+}
+
 export interface UseVaporResult {
   // State
   loading: boolean;
@@ -32,7 +40,7 @@ export interface UseVaporResult {
   txSignature: string | null;
   
   // Actions
-  createMarket: (projectId: number, projectName: string, resolutionDays?: number) => Promise<string | null>;
+  createMarket: (projectId: number, projectName: string, resolutionDays?: number) => Promise<{ signature: string | null; address: string } | null>;
   buyShares: (projectId: number, side: 'yes' | 'no', solAmount: number) => Promise<string | null>;
   sellShares: (projectId: number, side: 'yes' | 'no', sharesToSell: number) => Promise<string | null>;
   resolveMarket: (projectId: number, winner: 'yes' | 'no') => Promise<string | null>;
@@ -42,6 +50,7 @@ export interface UseVaporResult {
   checkMarketExists: (projectId: number) => Promise<boolean>;
   getPosition: (projectId: number, side: 'yes' | 'no') => Promise<PositionData | null>;
   getPositions: (projectId: number) => Promise<{ yes: PositionData | null; no: PositionData | null }>;
+  getAllPositions: () => Promise<UserPosition[]>;
   estimateTrade: (yesPool: number, noPool: number, amount: number, side: 'yes' | 'no') => number;
   
   // Helpers
@@ -87,7 +96,7 @@ export function useVapor(): UseVaporResult {
     projectId: number,
     projectName: string,
     resolutionDays: number = 7
-  ): Promise<string | null> => {
+  ): Promise<{ signature: string | null; address: string } | null> => {
     if (!publicKey) {
       setError('Connect wallet first');
       return null;
@@ -98,12 +107,12 @@ export function useVapor(): UseVaporResult {
 
     try {
       const [marketPDA, bump] = deriveMarketPDA(projectId);
+      const marketAddress = marketPDA.toBase58();
       
       const existing = await getMarketAccount(projectId);
       if (existing.exists) {
-        setError('Market already exists');
-        setLoading(false);
-        return null;
+        console.log('Market already exists on-chain, syncing...');
+        return { signature: null, address: marketAddress };
       }
 
       const resolutionTimestamp = Math.floor(Date.now() / 1000) + (resolutionDays * 24 * 60 * 60);
@@ -121,8 +130,17 @@ export function useVapor(): UseVaporResult {
       const sig = await sendTransaction(tx);
       
       setLoading(false);
-      return sig;
+      return sig ? { signature: sig, address: marketAddress } : null;
     } catch (err: any) {
+      // Handle "Account already in use" error (RPC consistency issue)
+      const msg = err.message || JSON.stringify(err);
+      if (msg.includes('already in use') || msg.includes('custom program error: 0x0')) {
+        console.log('Market exists (caught via tx error), syncing...');
+        const [marketPDA] = deriveMarketPDA(projectId);
+        setLoading(false);
+        return { signature: null, address: marketPDA.toBase58() };
+      }
+
       setError(err.message || 'Failed to create market');
       setLoading(false);
       return null;
@@ -321,6 +339,20 @@ export function useVapor(): UseVaporResult {
     return { yes: yesPos, no: noPos };
   }, [publicKey, getPosition]);
 
+  // Get all user positions efficiently
+  const getAllPositions = useCallback(async (): Promise<UserPosition[]> => {
+    if (!publicKey) return [];
+    
+    const rawPositions = await getAllUserPositions(publicKey);
+    
+    return rawPositions.map(p => ({
+      marketAddress: p.market.toBase58(),
+      side: p.side === 0 ? 'yes' : 'no',
+      shares: p.shares,
+      avgPrice: p.avgPrice,
+    }));
+  }, [publicKey]);
+
   // Estimate shares from trade
   const estimateTrade = useCallback((
     yesPool: number,
@@ -344,6 +376,7 @@ export function useVapor(): UseVaporResult {
     checkMarketExists,
     getPosition,
     getPositions,
+    getAllPositions,
     estimateTrade,
     clearError,
   };

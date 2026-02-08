@@ -6,6 +6,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Market } from '@/lib/types';
 import { useVapor, PositionData } from '@/hooks/useVapor';
 import { PriceChart } from './PriceChart';
+import { deriveMarketPDA } from '@/lib/vapor-client';
 
 interface MarketCardProps {
   market: Market;
@@ -31,7 +32,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
   const [loading, setLoading] = useState(false);
   const [amount, setAmount] = useState<string>('0.01');
   const [sellAmount, setSellAmount] = useState<string>('');
-  const [marketOnChain, setMarketOnChain] = useState<boolean | null>(null);
+  const [marketOnChain, setMarketOnChain] = useState<boolean | null>(!!market.marketAddress);
   const [positions, setPositions] = useState<{ yes: PositionData | null; no: PositionData | null }>({ yes: null, no: null });
   const [showTxLink, setShowTxLink] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'yes' | 'no'>('yes');
@@ -45,12 +46,14 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
   
   // Check if market exists on-chain
   useEffect(() => {
+    if (marketOnChain) return; // Trust state if already set (or from DB initial)
+    
     const check = async () => {
       const exists = await checkMarketExists(market.projectId);
-      setMarketOnChain(exists);
+      if (exists) setMarketOnChain(true);
     };
     check();
-  }, [market.projectId, checkMarketExists]);
+  }, [market.projectId, checkMarketExists, marketOnChain]);
   
   // Fetch user's positions (both YES and NO)
   useEffect(() => {
@@ -80,16 +83,27 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
     try {
       // First, ensure market exists on-chain
       if (!marketOnChain) {
-        const createSig = await createMarket(
+        const deployResult = await createMarket(
           market.projectId,
           market.projectName,
           7
         );
         
-        if (!createSig) {
+        if (!deployResult) {
           setLoading(false);
           return;
         }
+        
+        // Save to Supabase
+        await fetch(`/api/markets/${market.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            action: 'deploy',
+            marketAddress: deployResult.address,
+            txSignature: deployResult.signature
+          }),
+        });
         
         setMarketOnChain(true);
       }
@@ -183,7 +197,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
       setLoading(false);
     }
   };
-  
+
   // Deploy market on-chain (anyone can call this crank)
   const handleDeployMarket = async () => {
     if (!connected) {
@@ -195,12 +209,28 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
     clearError();
     
     try {
-      const sig = await createMarket(market.projectId, market.projectName, 7);
+      const result = await createMarket(market.projectId, market.projectName, 7);
       
-      if (sig) {
+      if (result) {
         setMarketOnChain(true);
         setShowDeployModal(false);
-        setShowTxLink(sig);
+        
+        // Show tx link if we have a signature
+        if (result.signature) {
+          setShowTxLink(result.signature);
+        }
+        
+        // Save to Supabase
+        await fetch(`/api/markets/${market.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            action: 'deploy',
+            marketAddress: result.address,
+            txSignature: result.signature
+          }),
+        });
+        
         setTimeout(() => setShowTxLink(null), 10000);
       }
     } catch (error) {

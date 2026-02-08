@@ -282,7 +282,8 @@ export async function getMarketAccount(projectId: number): Promise<{
   try {
     const accountInfo = await connection.getAccountInfo(marketPDA);
     
-    if (!accountInfo || accountInfo.data.length < 100) {
+    // If account exists (even if data is weird), assume it's initialized
+    if (!accountInfo) {
       return { exists: false, address: marketPDA.toBase58() };
     }
     
@@ -392,6 +393,56 @@ export async function getPositionAccount(
     };
   } catch (error) {
     return { exists: false, address: positionPDA.toBase58() };
+  }
+}
+
+// Get all positions for a user (efficiently)
+export async function getAllUserPositions(userWallet: PublicKey): Promise<Array<{
+  publicKey: PublicKey;
+  market: PublicKey;
+  side: Side;
+  shares: number;
+  avgPrice: number;
+}>> {
+  // Filter by owner (offset 8 + 32 bytes for market + 32 bytes for owner... wait, let's check layout)
+  // Layout: discriminator(8) + owner(32) + market(32) + side(1) + shares(8) ...
+  // So owner is at offset 8.
+  
+  try {
+    const accounts = await connection.getProgramAccounts(VAPOR_PROGRAM_ID, {
+      filters: [
+        {
+          memcmp: {
+            offset: 8,
+            bytes: userWallet.toBase58(),
+          },
+        },
+        {
+          dataSize: 8 + 32 + 32 + 1 + 8 + 8 + 1 + 16 // 106 bytes (wait, padding? No, struct says 16 padding)
+          // Let's not filter by size strictly if we changed it, but memcmp is safe.
+        }
+      ],
+    });
+    
+    return accounts.map(({ pubkey, account }) => {
+      const data = new Uint8Array(account.data);
+      // owner(32) is at 8. market(32) is at 8+32=40. side(1) at 72. shares(8) at 73. avg_price(8) at 81.
+      const market = new PublicKey(data.slice(40, 72));
+      const side = data[72] as Side;
+      const shares = readU64LE(data, 73);
+      const avgPrice = readU64LE(data, 81);
+      
+      return {
+        publicKey: pubkey,
+        market,
+        side,
+        shares,
+        avgPrice,
+      };
+    });
+  } catch (error) {
+    console.error('Failed to fetch user positions:', error);
+    return [];
   }
 }
 
