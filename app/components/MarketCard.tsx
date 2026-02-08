@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Market } from '@/lib/types';
@@ -15,6 +16,7 @@ interface MarketCardProps {
 }
 
 export function MarketCard({ market, onUpdate }: MarketCardProps) {
+  const router = useRouter();
   const { connected, publicKey } = useWallet();
   const { setVisible } = useWalletModal();
   const { 
