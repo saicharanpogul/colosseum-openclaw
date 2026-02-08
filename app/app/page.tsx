@@ -17,11 +17,14 @@ export default function Home() {
   const [showParticipateModal, setShowParticipateModal] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  // Filter for deployed markets only (have market_address)
+  const deployedMarkets = markets.filter(m => m.marketAddress);
+
   const stats: VaporStats = {
-    totalMarkets: markets.length,
-    activeMarkets: markets.filter(m => m.status === 'open').length,
-    totalTraders: markets.reduce((sum, m) => sum + (m.participants || 0), 0),
-    totalVolume: markets.reduce((sum, m) => sum + m.totalVolume, 0),
+    totalMarkets: deployedMarkets.length,
+    activeMarkets: deployedMarkets.filter(m => m.status === 'open').length,
+    totalTraders: deployedMarkets.reduce((sum, m) => sum + (m.participants || 0), 0),
+    totalVolume: deployedMarkets.reduce((sum, m) => sum + m.totalVolume, 0),
   };
 
   // Filter markets by search

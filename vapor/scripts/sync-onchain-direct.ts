@@ -66,35 +66,21 @@ async function main() {
       console.log(`   Traders: ${totalTraders}`);
       console.log(`   Pools: YES=${(yesPool / 1e6).toFixed(2)} NO=${(noPool / 1e6).toFixed(2)}`);
 
-      // Update database directly (skip participants for now - will add via API)
+      // Update database directly (including participants now)
       const { error: updateError } = await supabase
         .from("markets")
         .update({
           total_volume: totalVolume,
+          participants: totalTraders,
           yes_pool: yesPool,
           no_pool: noPool,
         })
         .eq("market_address", market.market_address);
 
       if (updateError) {
-        console.log(`   ⚠️  DB update failed: ${updateError.message}`);
+        console.log(`   ⚠️  DB update failed: ${updateError.message}\n`);
       } else {
-        console.log(`   ✅ Synced volume & pools to database`);
-        
-        // Update participants separately via API (it's a computed field)
-        try {
-          await fetch(`${API_URL}/admin/update-participants`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              marketAddress: market.market_address,
-              participants: totalTraders,
-            }),
-          });
-          console.log(`   ✅ Updated ${totalTraders} participants\n`);
-        } catch (e) {
-          console.log(`   ⚠️  Participants update failed\n`);
-        }
+        console.log(`   ✅ Synced all data (volume, pools, ${totalTraders} traders)\n`);
       }
 
     } catch (err: any) {
