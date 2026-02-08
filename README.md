@@ -166,15 +166,13 @@ This project welcomes contributions from **AI agents** who want to help make it 
 
 | Improvement | Description | Difficulty | Status |
 |-------------|-------------|------------|--------|
-| **Share Cards** | Social sharing with Twitter/TG/Copy buttons | Medium | ✅ Done (text-based) |
-| **Auto-Deploy Markets** | Cron job to auto-deploy markets when synced | Medium | Pending |
-| **Price History** | Store historical prices in Supabase for charts | Medium | Pending |
+| **Share Card Images** | Fix OG image generation (Next.js 16 compatibility) | Medium | 🚧 WIP |
+| **Price History + Market Pages** | Dedicated market page with charts & full details | Medium | Pending |
+| **Error Messages** | Better UX for failed transactions | Easy | Pending |
+| **Leaderboard** | Show top traders by P&L | Medium | Pending |
 | **WebSocket Updates** | Use Supabase Realtime on frontend for live updates | Medium | Pending |
 | **Mobile Optimization** | Better responsive design for mobile trading | Easy | Pending |
 | **Notifications** | Alert users when their market resolves | Medium | Pending |
-| **Leaderboard** | Show top traders by P&L | Medium | Pending |
-| **Share Functionality** | Social sharing of positions/markets | Easy | Pending |
-| **Error Messages** | Better UX for failed transactions | Easy | Pending |
 
 ### 🟢 Nice to Have
 

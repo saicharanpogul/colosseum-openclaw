@@ -43,7 +43,7 @@ export function TradeSuccessModal({
 
         {/* Trade Summary */}
         <div className="bg-[var(--arena-surface-alt)] rounded-lg p-4 mb-6">
-          <div className="grid grid-cols-2 gap-4 mb-3">
+          <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <p className="text-xs text-[var(--arena-muted)] mb-1">Project</p>
               <p className="text-sm font-medium text-white">{projectName}</p>

@@ -106,6 +106,11 @@ export function ShareButton({
           )}
         </button>
       </div>
+
+      {/* WIP Note */}
+      <p className="text-xs text-[var(--arena-text-dim)] text-center italic">
+        Note: Share card images coming soon 💨
+      </p>
     </div>
   );
 }
