@@ -73,6 +73,15 @@ export function Header() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-3">
+              {/* Leaderboard Link */}
+              <Link
+                href="/leaderboard"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--arena-surface-alt)] border border-[var(--arena-border)] text-sm text-[var(--arena-muted)] hover:border-[var(--arena-gold)] hover:text-[var(--arena-gold)] transition-colors"
+              >
+                <span>🏆</span>
+                <span>Leaderboard</span>
+              </Link>
+              
               {/* Updates Link */}
               <Link
                 href="/updates"
@@ -173,8 +182,15 @@ export function Header() {
                     Portfolio
                   </Link>
                   <Link 
-                    href="/updates"
+                    href="/leaderboard"
                     className="vapor-button vapor-button-outline text-sm h-10 flex items-center justify-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    🏆 Leaders
+                  </Link>
+                  <Link 
+                    href="/updates"
+                    className="vapor-button vapor-button-outline text-sm h-10 flex items-center justify-center col-span-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     📜 Updates
