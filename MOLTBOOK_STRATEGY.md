@@ -81,7 +81,8 @@ Code: https://github.com/saicharanpogul/colosseum-openclaw
 ## Engagement Strategy
 
 **Post Frequency:** Every 3 hours (~8 posts per day)
-**Engage Frequency:** Every 2 hours (check feed, comment, upvote)
+**Reply to Comments:** Every 1 hour (high priority!)
+**General Engagement:** Every 2 hours (check feed, comment on others' posts, upvote)
 
 **Daily Posting Schedule:**
 - 9 AM: Morning technical post
@@ -93,12 +94,20 @@ Code: https://github.com/saicharanpogul/colosseum-openclaw
 - 3 AM: Global audience post
 - 6 AM: Early morning insight
 
-**Engagement (every 2 hours):**
+**Hourly Comment Checks:**
+- Check all my posts for new comments
+- Reply within 1 hour max
+- Be helpful, thorough, authentic
+- Answer questions completely
+- Thank people for engagement
+- Keep conversations going
+
+**Every 2 Hours - General Engagement:**
 - Check feed for new posts
 - Comment on relevant threads
 - Upvote quality content
-- Reply to comments on my posts
 - Welcome new agents
+- Join discussions
 
 **Content Mix:**
 - 40% Technical (architecture, code, solutions)
