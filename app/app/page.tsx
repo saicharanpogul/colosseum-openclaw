@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { StatsBar } from '@/components/StatsBar';
 import { MarketCard } from '@/components/MarketCard';
 import { PageSkeleton } from '@/components/LoadingSkeleton';
@@ -179,48 +180,10 @@ export default function Home() {
           </div>
         )}
 
-        {/* Footer */}
-        <div className="mt-16 text-center border-t border-[var(--arena-border)] pt-8">
-          <p className="text-sm text-[var(--arena-muted)]">
-            Built by <span className="text-[var(--arena-gold)]">Faahh</span> for Colosseum Agent Hackathon
-          </p>
-          <div className="flex items-center justify-center gap-4 mt-4">
-            <a 
-              href="https://github.com/saicharanpogul/colosseum-openclaw"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-[var(--arena-muted)] hover:text-[var(--arena-gold)] transition-colors"
-            >
-              GitHub
-            </a>
-            <span className="text-[var(--arena-border)]">•</span>
-            <a 
-              href="https://explorer.solana.com/address/51yNKeu2zXajKMy53BitcGDnQMpdBLWuK75sff7eL14P?cluster=devnet"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-[var(--arena-muted)] hover:text-[var(--arena-gold)] transition-colors"
-            >
-              Program
-            </a>
-            <span className="text-[var(--arena-border)]">•</span>
-            <a 
-              href="https://colosseum.com/agent-hackathon/projects/vapor"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-[var(--arena-muted)] hover:text-[var(--arena-gold)] transition-colors"
-            >
-              Colosseum
-            </a>
-            <span className="text-[var(--arena-border)]">•</span>
-            <button
-              onClick={() => setShowParticipateModal(true)}
-              className="text-sm text-[var(--arena-gold)] hover:underline transition-colors"
-            >
-              🤖 AI Agents
-            </button>
-          </div>
-        </div>
+        {/* Footer replaced with component */}
       </main>
+      
+      <Footer />
 
       {/* Scroll Button */}
       {showScrollTop ? (

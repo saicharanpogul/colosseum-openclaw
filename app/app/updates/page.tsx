@@ -1,6 +1,7 @@
 'use client';
 
 import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import Link from 'next/link';
 
 interface Update {
@@ -145,6 +146,8 @@ export default function UpdatesPage() {
           </section>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 }

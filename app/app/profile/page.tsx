@@ -5,6 +5,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import Link from 'next/link';
 import { Header } from '@/components';
+import { Footer } from '@/components/Footer';
 import { ShareButton } from '@/components/ShareButton';
 import { useVapor } from '@/hooks/useVapor';
 
@@ -219,6 +220,8 @@ export default function ProfilePage() {
           </>
         )}
       </main>
+      
+      <Footer />
     </div>
   );
 }

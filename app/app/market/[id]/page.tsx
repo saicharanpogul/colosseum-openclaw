@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { Market } from '@/lib/types';
 import { MarketCard } from '@/components/MarketCard';
 import { useToast } from '@/components/ToastProvider';
@@ -370,6 +371,8 @@ export default function MarketDetailPage() {
           </div>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 }

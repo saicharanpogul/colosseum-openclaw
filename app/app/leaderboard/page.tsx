@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { useWallet } from '@solana/wallet-adapter-react';
 
 interface LeaderboardEntry {
@@ -254,6 +255,8 @@ export default function LeaderboardPage() {
           </p>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 }
