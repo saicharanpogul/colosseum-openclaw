@@ -5,6 +5,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import Link from 'next/link';
 import { Header } from '@/components';
+import { ShareButton } from '@/components/ShareButton';
 import { useVapor } from '@/hooks/useVapor';
 
 interface PositionDisplay {
@@ -179,7 +180,7 @@ export default function ProfilePage() {
                       : 'border-l-[var(--vapor-red)]'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-white">
                         {position.projectName}
@@ -201,6 +202,17 @@ export default function ProfilePage() {
                       <p className="text-xs text-[var(--vapor-muted)]">est. value</p>
                     </div>
                   </div>
+                  
+                  {/* Share Button */}
+                  <ShareButton
+                    projectName={position.projectName}
+                    projectId={position.projectId}
+                    side={position.side}
+                    shares={position.shares / 1e9}
+                    odds={position.marketOdds}
+                    value={(position.shares / 1e9) * (position.marketOdds / 100)}
+                    wallet={publicKey ? `${publicKey.toBase58().slice(0, 4)}...${publicKey.toBase58().slice(-4)}` : ''}
+                  />
                 </div>
               ))}
             </div>
