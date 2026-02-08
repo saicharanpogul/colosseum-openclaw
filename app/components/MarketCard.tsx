@@ -9,6 +9,7 @@ import { useVapor, PositionData } from '@/hooks/useVapor';
 import { PriceChart } from './PriceChart';
 import { TradeSuccessModal } from './TradeSuccessModal';
 import { deriveMarketPDA } from '@/lib/vapor-client';
+import { useToast } from './ToastProvider';
 
 interface MarketCardProps {
   market: Market;
@@ -19,6 +20,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
   const router = useRouter();
   const { connected, publicKey } = useWallet();
   const { setVisible } = useWalletModal();
+  const { showToast } = useToast();
   const { 
     loading: vaporLoading, 
     error: vaporError, 
@@ -159,8 +161,12 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
         
         setTimeout(() => setShowTxLink(null), 10000);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to buy shares:', error);
+      showToast(
+        error?.message || 'Failed to buy shares. Please try again.',
+        'error'
+      );
     } finally {
       setLoading(false);
     }
@@ -211,8 +217,12 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
         
         setTimeout(() => setShowTxLink(null), 10000);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to sell shares:', error);
+      showToast(
+        error?.message || 'Failed to sell shares. Please try again.',
+        'error'
+      );
     } finally {
       setLoading(false);
     }
@@ -253,8 +263,12 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
         
         setTimeout(() => setShowTxLink(null), 10000);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to deploy market:', error);
+      showToast(
+        error?.message || 'Failed to deploy market. Please try again.',
+        'error'
+      );
     } finally {
       setDeploying(false);
     }

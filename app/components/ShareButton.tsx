@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useToast } from './ToastProvider';
 
 interface ShareButtonProps {
   projectName: string;
@@ -22,6 +23,7 @@ export function ShareButton({
   wallet,
 }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
+  const { showToast } = useToast();
 
   const shareUrl = `https://app-rosy-mu.vercel.app/?project=${projectId}`;
 
@@ -47,9 +49,11 @@ export function ShareButton({
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
+      showToast('Copied to clipboard!', 'success');
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
+      showToast('Failed to copy to clipboard', 'error');
     }
   };
 
