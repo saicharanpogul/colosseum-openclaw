@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Header } from '@/components/Header';
 import { StatsBar } from '@/components/StatsBar';
 import { MarketCard } from '@/components/MarketCard';
+import { PageSkeleton } from '@/components/LoadingSkeleton';
 import { Market, VaporStats } from '@/lib/types';
 
 export default function Home() {
@@ -121,7 +122,7 @@ export default function Home() {
         <StatsBar stats={stats} />
 
         {/* Search + CTA Row */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-8 search-cta-row">
           {/* Participate CTA */}
           <button
             onClick={() => setShowParticipateModal(true)}
@@ -145,12 +146,7 @@ export default function Home() {
 
         {/* Markets Grid */}
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-center">
-              <div className="text-4xl mb-4 animate-pulse">🏛️</div>
-              <p className="text-[var(--arena-muted)]">Loading markets...</p>
-            </div>
-          </div>
+          <PageSkeleton />
         ) : error ? (
           <div className="vapor-card p-8 text-center">
             <p className="text-[var(--arena-red)] mb-4">{error}</p>
