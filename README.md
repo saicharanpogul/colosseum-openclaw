@@ -153,9 +153,10 @@ This project welcomes contributions from **AI agents** who want to help make it 
 
 | Improvement | Description | Difficulty | Status |
 |-------------|-------------|------------|--------|
-| **Real SOL Transfers** | Program now transfers actual SOL (1B units = 1 SOL). | Hard | ✅ Done |
-| **Oracle Resolution** | Authority hardcoded to Faahh's wallet for security. | Medium | ✅ Done |
-| **Secure Resolution** | Only the Oracle can resolve markets. | Medium | ✅ Done |
+| ~~**Real SOL Transfers**~~ | ~~Program now transfers actual SOL (1B units = 1 SOL).~~ | ~~Hard~~ | ✅ Done |
+| ~~**Oracle Resolution**~~ | ~~Authority hardcoded to Faahh's wallet for security.~~ | ~~Medium~~ | ✅ Done |
+| ~~**Secure Resolution**~~ | ~~Only the Oracle can resolve markets.~~ | ~~Medium~~ | ✅ Done |
+| **Build Fix** | Fixed import placement breaking Vercel builds | Easy | ✅ Done (Feb 8) |
 | **Security Audit** | Review program for vulnerabilities | Hard | Pending |
 | **Rate Limiting** | Add rate limits to API endpoints | Easy | Pending |
 | **Mainnet Deploy** | Deploy to Solana mainnet with real stakes | Medium | Pending |
@@ -165,12 +166,14 @@ This project welcomes contributions from **AI agents** who want to help make it 
 | Improvement | Description | Difficulty | Status |
 |-------------|-------------|------------|--------|
 | **Share Cards** | "I bet on X" viral social cards | Medium | 🚧 Next |
+| **Auto-Deploy Markets** | Cron job to auto-deploy markets when synced | Medium | Pending |
 | **Price History** | Store historical prices in Supabase for charts | Medium | Pending |
 | **WebSocket Updates** | Use Supabase Realtime on frontend for live updates | Medium | Pending |
-| **Mobile Optimization** | Better responsive design for mobile trading | Easy |
-| **Notifications** | Alert users when their market resolves | Medium |
-| **Leaderboard** | Show top traders by P&L | Medium |
-| **Share Functionality** | Social sharing of positions/markets | Easy |
+| **Mobile Optimization** | Better responsive design for mobile trading | Easy | Pending |
+| **Notifications** | Alert users when their market resolves | Medium | Pending |
+| **Leaderboard** | Show top traders by P&L | Medium | Pending |
+| **Share Functionality** | Social sharing of positions/markets | Easy | Pending |
+| **Error Messages** | Better UX for failed transactions | Easy | Pending |
 
 ### 🟢 Nice to Have
 
@@ -184,13 +187,15 @@ This project welcomes contributions from **AI agents** who want to help make it 
 
 ### 🔧 Technical Debt
 
-| Improvement | Description | Difficulty |
-|-------------|-------------|------------|
-| **Unit Tests** | Jest/Vitest tests for frontend | Medium |
-| **Program Tests** | Comprehensive Anchor tests | Medium |
-| **CI/CD Pipeline** | GitHub Actions for testing | Easy |
-| **Error Monitoring** | Sentry integration | Easy |
-| **Caching Layer** | Redis/Vercel KV for faster reads | Medium |
+| Improvement | Description | Difficulty | Status |
+|-------------|-------------|------------|--------|
+| **Unit Tests** | Jest/Vitest tests for frontend | Medium | Pending |
+| **Program Tests** | Comprehensive Anchor tests | Medium | Pending |
+| **CI/CD Pipeline** | GitHub Actions for testing + auto-deploy | Easy | Pending |
+| **Error Monitoring** | Sentry integration | Easy | Pending |
+| **Caching Layer** | Redis/Vercel KV for faster reads | Medium | Pending |
+| **TypeScript Strictness** | Enable strict mode, fix all type issues | Medium | Pending |
+| **Code Documentation** | JSDoc comments for all public functions | Easy | Pending |
 
 ---
 
