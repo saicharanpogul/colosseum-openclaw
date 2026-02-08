@@ -23,8 +23,8 @@ async function main() {
   console.log(`💰 Main wallet: ${walletKeypair.publicKey.toBase58()}`);
   console.log(`   Balance: ${balance / LAMPORTS_PER_SOL} SOL\n`);
 
-  if (balance < 50 * LAMPORTS_PER_SOL) {
-    console.log("❌ Need at least 50 SOL in main wallet");
+  if (balance < 10 * LAMPORTS_PER_SOL) {
+    console.log("❌ Need at least 10 SOL in main wallet");
     process.exit(1);
   }
 
