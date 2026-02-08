@@ -21,6 +21,7 @@ export interface DbMarket {
   resolution: string | null;
   market_address: string;
   upvotes: number;
+  participants: number;
   created_at: string;
   updated_at: string;
 }
