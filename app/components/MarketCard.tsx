@@ -14,9 +14,10 @@ import { useToast } from './ToastProvider';
 interface MarketCardProps {
   market: Market;
   onUpdate?: (market: Market) => void;
+  compact?: boolean; // Hide header/project info when used in detail page
 }
 
-export function MarketCard({ market, onUpdate }: MarketCardProps) {
+export function MarketCard({ market, onUpdate, compact = false }: MarketCardProps) {
   const router = useRouter();
   const { connected, publicKey } = useWallet();
   const { setVisible } = useWalletModal();
@@ -294,7 +295,7 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
   return (
     <div className={`vapor-card p-6 ${isVaporProject ? 'ring-2 ring-[var(--arena-gold)] relative' : ''}`}>
       {/* Vapor Badge */}
-      {isVaporProject && (
+      {!compact && isVaporProject && (
         <div 
           className="absolute -top-2 -right-2 px-2 py-1 bg-gradient-to-r from-[var(--arena-gold)] to-[#f5d799] text-black text-xs font-bold rounded-full cursor-help group"
           title="Bet on the oracle. Will Faahh see the future? 💨"
@@ -303,51 +304,56 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
         </div>
       )}
       
-      {/* Header - Clickable to view details */}
-      <div 
-        className="flex items-start justify-between mb-2 cursor-pointer hover:opacity-80 transition-opacity"
-        onClick={() => router.push(`/market/${market.id}`)}
-      >
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-white mb-1">
-            {market.projectName}
-          </h3>
-        </div>
-        <div className="flex items-center gap-2">
-          <a
-            href={colosseumLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-1 rounded hover:bg-[var(--arena-surface-alt)] transition-colors"
-            title="View on Colosseum"
+      {/* Header - Clickable to view details - Hidden in compact mode */}
+      {!compact && (
+        <>
+          <div 
+            className="flex items-start justify-between mb-2 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => router.push(`/market/${market.id}`)}
           >
-            <svg className="w-4 h-4 text-[var(--arena-muted)] hover:text-[var(--arena-gold)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </a>
-          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-            isResolved 
-              ? 'bg-[var(--vapor-accent)]/20 text-[var(--vapor-accent)]' 
-              : 'bg-[var(--vapor-green)]/20 text-[var(--vapor-green)]'
-          }`}>
-            {isResolved ? 'Resolved' : 'Open'}
-          </div>
-        </div>
-      </div>
-      
-      {/* Question - Fixed height with tooltip for overflow */}
-      <div className="relative group mb-3">
-        <p className="text-sm text-[var(--vapor-muted)] line-clamp-2 h-10">
-          {market.question}
-        </p>
-        {market.question.length > 80 && (
-          <div className="absolute left-0 right-0 bottom-full mb-2 hidden group-hover:block z-20">
-            <div className="bg-[var(--arena-surface)] border border-[var(--arena-border)] rounded-lg p-3 text-sm text-[var(--arena-text)] shadow-lg">
-              {market.question}
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-white mb-1">
+                {market.projectName}
+              </h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <a
+                href={colosseumLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-1 rounded hover:bg-[var(--arena-surface-alt)] transition-colors"
+                title="View on Colosseum"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <svg className="w-4 h-4 text-[var(--arena-muted)] hover:text-[var(--arena-gold)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+              <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                isResolved 
+                  ? 'bg-[var(--vapor-accent)]/20 text-[var(--vapor-accent)]' 
+                  : 'bg-[var(--vapor-green)]/20 text-[var(--vapor-green)]'
+              }`}>
+                {isResolved ? 'Resolved' : 'Open'}
+              </div>
             </div>
           </div>
-        )}
-      </div>
+          
+          {/* Question - Fixed height with tooltip for overflow */}
+          <div className="relative group mb-3">
+            <p className="text-sm text-[var(--vapor-muted)] line-clamp-2 h-10">
+              {market.question}
+            </p>
+            {market.question.length > 80 && (
+              <div className="absolute left-0 right-0 bottom-full mb-2 hidden group-hover:block z-20">
+                <div className="bg-[var(--arena-surface)] border border-[var(--arena-border)] rounded-lg p-3 text-sm text-[var(--arena-text)] shadow-lg">
+                  {market.question}
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
       
       {/* Deployment Status - Highlighted */}
       {marketOnChain !== null && (

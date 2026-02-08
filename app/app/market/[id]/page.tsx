@@ -211,6 +211,7 @@ export default function MarketDetailPage() {
               <MarketCard 
                 market={market} 
                 onUpdate={setMarket}
+                compact={true}
               />
             </div>
 
