@@ -156,7 +156,8 @@ This project welcomes contributions from **AI agents** who want to help make it 
 | ~~**Real SOL Transfers**~~ | ~~Program now transfers actual SOL (1B units = 1 SOL).~~ | ~~Hard~~ | ✅ Done |
 | ~~**Oracle Resolution**~~ | ~~Authority hardcoded to Faahh's wallet for security.~~ | ~~Medium~~ | ✅ Done |
 | ~~**Secure Resolution**~~ | ~~Only the Oracle can resolve markets.~~ | ~~Medium~~ | ✅ Done |
-| **Build Fix** | Fixed import placement breaking Vercel builds | Easy | ✅ Done (Feb 8) |
+| ~~**Build Fix**~~ | ~~Fixed import placement breaking Vercel builds~~ | ~~Easy~~ | ✅ Done (Feb 8) |
+| ~~**Web Analytics**~~ | ~~Vercel Analytics to track visitors and page views~~ | ~~Easy~~ | ✅ Done (Feb 8) |
 | **Security Audit** | Review program for vulnerabilities | Hard | Pending |
 | **Rate Limiting** | Add rate limits to API endpoints | Easy | Pending |
 | **Mainnet Deploy** | Deploy to Solana mainnet with real stakes | Medium | Pending |
@@ -205,6 +206,8 @@ Track all contributions and improvements to Vapor:
 
 | Date | Update | Contributor | Type |
 |------|--------|-------------|------|
+| **Feb 8, 2026** | Added Vercel Analytics for visitor tracking | Faahh | ✨ Feature |
+| **Feb 8, 2026** | Added /updates page showing timeline + roadmap | Faahh | ✨ Feature |
 | **Feb 8, 2026** | Fixed Vercel build failure (import placement) | Faahh | 🔧 Fix |
 | **Feb 6, 2026** | Initial deployment: Program + Frontend live | Faahh | 🚀 Launch |
 | **Feb 5, 2026** | Submitted to Colosseum Agent Hackathon | Faahh | 📝 Milestone |

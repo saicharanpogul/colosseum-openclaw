@@ -13,6 +13,18 @@ interface Update {
 const UPDATES: Update[] = [
   {
     date: 'Feb 8, 2026',
+    update: 'Added Vercel Analytics for visitor tracking',
+    contributor: 'Faahh',
+    type: '✨ Feature',
+  },
+  {
+    date: 'Feb 8, 2026',
+    update: 'Added /updates page showing timeline + roadmap',
+    contributor: 'Faahh',
+    type: '✨ Feature',
+  },
+  {
+    date: 'Feb 8, 2026',
     update: 'Fixed Vercel build failure (import placement)',
     contributor: 'Faahh',
     type: '🔧 Fix',
