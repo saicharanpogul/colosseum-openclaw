@@ -377,3 +377,230 @@ input[type="number"]::-webkit-inner-spin-button {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Updates Page */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--arena-text-dim);
+  text-decoration: none;
+  margin-bottom: 32px;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: var(--arena-gold);
+}
+
+.page-header {
+  margin-bottom: 48px;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--arena-gold), var(--arena-text));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-subtitle {
+  font-size: 1.125rem;
+  color: var(--arena-text-dim);
+  line-height: 1.6;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: var(--arena-text);
+}
+
+.section-description {
+  color: var(--arena-text-dim);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.text-link {
+  color: var(--arena-gold);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.text-link:hover {
+  opacity: 0.8;
+}
+
+/* Timeline */
+.updates-section {
+  margin-bottom: 64px;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: var(--arena-surface);
+  border: 1px solid var(--arena-border);
+  border-radius: 12px;
+  transition: border-color 0.2s;
+}
+
+.timeline-item:hover {
+  border-color: var(--arena-gold-dim);
+}
+
+.timeline-marker {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.timeline-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+}
+
+.timeline-date {
+  color: var(--arena-gold);
+  font-weight: 500;
+}
+
+.timeline-contributor {
+  color: var(--arena-text-dim);
+}
+
+.timeline-update {
+  color: var(--arena-text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Roadmap */
+.roadmap-section {
+  margin-bottom: 64px;
+}
+
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.roadmap-card {
+  padding: 20px;
+  background: var(--arena-surface);
+  border: 1px solid var(--arena-border);
+  border-radius: 12px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.roadmap-card:hover {
+  border-color: var(--arena-gold-dim);
+  transform: translateY(-2px);
+}
+
+.roadmap-priority {
+  font-size: 0.875rem;
+  margin-bottom: 12px;
+  color: var(--arena-text-dim);
+}
+
+.roadmap-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--arena-text);
+}
+
+.roadmap-desc {
+  font-size: 0.875rem;
+  color: var(--arena-text-dim);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Agent CTA */
+.agent-cta {
+  padding: 40px;
+  background: linear-gradient(135deg, rgba(212, 168, 83, 0.1), rgba(212, 168, 83, 0.05));
+  border: 1px solid var(--arena-gold-dim);
+  border-radius: 16px;
+  margin-bottom: 64px;
+}
+
+.cta-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--arena-text);
+}
+
+.cta-description {
+  font-size: 1rem;
+  color: var(--arena-text-dim);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.cta-description code {
+  background: var(--arena-surface);
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: var(--arena-gold);
+  font-family: 'Courier New', monospace;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cta-button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cta-button.primary {
+  background: var(--arena-gold);
+  color: var(--arena-bg);
+}
+
+.cta-button.primary:hover {
+  background: var(--arena-gold-dim);
+  transform: translateY(-1px);
+}
+
+.cta-button.secondary {
+  background: transparent;
+  border: 1px solid var(--arena-gold-dim);
+  color: var(--arena-gold);
+}
+
+.cta-button.secondary:hover {
+  border-color: var(--arena-gold);
+  background: rgba(212, 168, 83, 0.1);
+}

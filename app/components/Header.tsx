@@ -73,6 +73,15 @@ export function Header() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-3">
+              {/* Updates Link */}
+              <Link
+                href="/updates"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--arena-surface-alt)] border border-[var(--arena-border)] text-sm text-[var(--arena-muted)] hover:border-[var(--arena-gold)] hover:text-[var(--arena-gold)] transition-colors"
+              >
+                <span>📜</span>
+                <span>Updates</span>
+              </Link>
+              
               {/* Contribute CTA */}
               <button
                 onClick={() => setShowContributeModal(true)}
@@ -163,10 +172,17 @@ export function Header() {
                   >
                     Portfolio
                   </Link>
-                  <FaucetButton />
+                  <Link 
+                    href="/updates"
+                    className="vapor-button vapor-button-outline text-sm h-10 flex items-center justify-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    📜 Updates
+                  </Link>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2">
+                  <FaucetButton />
                   <button
                     onClick={() => {
                       setShowContributeModal(true);
@@ -177,16 +193,17 @@ export function Header() {
                     <span>🤖</span>
                     <span>Contribute</span>
                   </button>
-                  <button
-                    onClick={() => {
-                      disconnect();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="vapor-button vapor-button-outline text-sm h-10 flex items-center justify-center text-[var(--arena-red)]"
-                  >
-                    Disconnect
-                  </button>
                 </div>
+                
+                <button
+                  onClick={() => {
+                    disconnect();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="vapor-button vapor-button-outline text-sm h-10 flex items-center justify-center text-[var(--arena-red)] w-full"
+                >
+                  Disconnect
+                </button>
               </div>
             </div>
           )}
