@@ -174,34 +174,25 @@ export default function MarketDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Trading */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Current Odds Display */}
-            <div className="vapor-card p-6">
-              <h2 className="text-xl font-bold text-white mb-4">Current Odds</h2>
-              <div className="grid grid-cols-2 gap-4">
-                {/* YES Side */}
-                <div className="bg-[var(--arena-surface-alt)] rounded-lg p-6 border-2 border-[var(--arena-green)]/30">
-                  <div className="text-center">
-                    <p className="text-sm text-[var(--arena-muted)] mb-2">YES</p>
-                    <p className="text-5xl font-bold text-[var(--arena-green)] mb-2">
-                      {market.yesOdds.toFixed(0)}%
-                    </p>
-                    <p className="text-xs text-[var(--arena-muted)]">
-                      {(market.yesPool / 1_000_000).toFixed(2)} SOL in pool
-                    </p>
-                  </div>
+            {/* Current Odds Display - Simplified */}
+            <div className="grid grid-cols-2 gap-3">
+              {/* YES Side */}
+              <div className="vapor-card p-4 border-2 border-[var(--arena-green)]/30">
+                <div className="text-center">
+                  <p className="text-xs text-[var(--arena-muted)] mb-1">YES</p>
+                  <p className="text-4xl font-bold text-[var(--arena-green)]">
+                    {market.yesOdds.toFixed(0)}%
+                  </p>
                 </div>
+              </div>
 
-                {/* NO Side */}
-                <div className="bg-[var(--arena-surface-alt)] rounded-lg p-6 border-2 border-[var(--arena-red)]/30">
-                  <div className="text-center">
-                    <p className="text-sm text-[var(--arena-muted)] mb-2">NO</p>
-                    <p className="text-5xl font-bold text-[var(--arena-red)] mb-2">
-                      {market.noOdds.toFixed(0)}%
-                    </p>
-                    <p className="text-xs text-[var(--arena-muted)]">
-                      {(market.noPool / 1_000_000).toFixed(2)} SOL in pool
-                    </p>
-                  </div>
+              {/* NO Side */}
+              <div className="vapor-card p-4 border-2 border-[var(--arena-red)]/30">
+                <div className="text-center">
+                  <p className="text-xs text-[var(--arena-muted)] mb-1">NO</p>
+                  <p className="text-4xl font-bold text-[var(--arena-red)]">
+                    {market.noOdds.toFixed(0)}%
+                  </p>
                 </div>
               </div>
             </div>
