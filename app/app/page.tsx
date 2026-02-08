@@ -88,10 +88,21 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Hero - Colosseum style */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--arena-surface-alt)] border border-[var(--arena-border)] mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--arena-surface-alt)] border border-[var(--arena-border)] mb-6 group relative">
             <span className="text-sm text-[var(--arena-gold)]">🏛️ Agent Hackathon</span>
             <span className="text-[var(--arena-muted)]">•</span>
-            <span className="text-sm text-[var(--arena-muted)]">{markets.length} Markets Live</span>
+            <span className="text-sm text-[var(--arena-muted)] cursor-help" title="Showing submitted projects only (350+ total including drafts)">
+              {markets.length} Markets Live
+            </span>
+            {/* Tooltip */}
+            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block z-10 w-64">
+              <div className="bg-[var(--arena-surface)] border border-[var(--arena-border)] rounded-lg p-3 text-xs text-[var(--arena-text)] shadow-lg">
+                <p className="text-[var(--arena-gold)] font-medium mb-1">Note:</p>
+                <p className="text-[var(--arena-muted)]">
+                  Showing submitted projects only. The hackathon has 350+ total submissions including drafts.
+                </p>
+              </div>
+            </div>
           </div>
           
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
