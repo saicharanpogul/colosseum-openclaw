@@ -6,6 +6,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Market } from '@/lib/types';
 import { useVapor, PositionData } from '@/hooks/useVapor';
 import { PriceChart } from './PriceChart';
+import { TradeSuccessModal } from './TradeSuccessModal';
 import { deriveMarketPDA } from '@/lib/vapor-client';
 
 interface MarketCardProps {
@@ -39,6 +40,13 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
   const [mode, setMode] = useState<'buy' | 'sell'>('buy');
   const [showDeployModal, setShowDeployModal] = useState(false);
   const [deploying, setDeploying] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [lastTrade, setLastTrade] = useState<{
+    side: 'yes' | 'no';
+    shares: number;
+    value: number;
+    txSignature: string;
+  } | null>(null);
   
   const isResolved = market.status === 'resolved';
   const amountNum = parseFloat(amount) || 0;
@@ -136,6 +144,16 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
         // Refresh positions
         const pos = await getPositions(market.projectId);
         setPositions(pos);
+        
+        // Show success modal
+        const currentOdds = side === 'yes' ? market.yesOdds : market.noOdds;
+        setLastTrade({
+          side,
+          shares: estimatedShares / 1e9,
+          value: amountNum,
+          txSignature: sig,
+        });
+        setShowSuccessModal(true);
         
         setTimeout(() => setShowTxLink(null), 10000);
       }
@@ -650,6 +668,22 @@ export function MarketCard({ market, onUpdate }: MarketCardProps) {
             Resolved: {market.resolution.toUpperCase()}
           </span>
         </div>
+      )}
+      
+      {/* Success Modal */}
+      {showSuccessModal && lastTrade && (
+        <TradeSuccessModal
+          show={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          projectName={market.projectName}
+          projectId={market.projectId}
+          side={lastTrade.side}
+          shares={lastTrade.shares}
+          odds={lastTrade.side === 'yes' ? market.yesOdds : market.noOdds}
+          value={lastTrade.value}
+          txSignature={lastTrade.txSignature}
+          wallet={publicKey ? `${publicKey.toBase58().slice(0, 4)}...${publicKey.toBase58().slice(-4)}` : ''}
+        />
       )}
     </div>
   );
