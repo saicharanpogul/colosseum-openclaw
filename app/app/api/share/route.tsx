@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     
     const projectName = searchParams.get('project') || 'Unknown Project';
-    const side = searchParams.get('side') as 'yes' | 'no' || 'yes';
+    const side = (searchParams.get('side') || 'yes') as 'yes' | 'no';
     const shares = searchParams.get('shares') || '0';
     const odds = searchParams.get('odds') || '50';
     const value = searchParams.get('value') || '0';
@@ -28,8 +28,7 @@ export async function GET(request: NextRequest) {
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: '#0c0c0c',
-            backgroundImage: 'radial-gradient(circle at 25px 25px, #1a1a1a 2%, transparent 0%), radial-gradient(circle at 75px 75px, #1a1a1a 2%, transparent 0%)',
-            backgroundSize: '100px 100px',
+            fontFamily: 'system-ui, -apple-system, sans-serif',
           }}
         >
           {/* Header */}
@@ -55,7 +54,6 @@ export async function GET(request: NextRequest) {
               borderRadius: '24px',
               padding: '48px 60px',
               width: '900px',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
             }}
           >
             {/* Project Name */}
@@ -163,8 +161,8 @@ export async function GET(request: NextRequest) {
       },
     );
   } catch (e: any) {
-    console.log(`${e.message}`);
-    return new Response(`Failed to generate image`, {
+    console.error('Share card error:', e);
+    return new Response(`Failed to generate image: ${e.message}`, {
       status: 500,
     });
   }
