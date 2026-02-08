@@ -293,7 +293,7 @@ export function MarketCard({ market, onUpdate, compact = false }: MarketCardProp
   const volumeInSol = (market.totalVolume / 1_000_000).toFixed(2);
   
   return (
-    <div className={`vapor-card p-6 ${isVaporProject ? 'ring-2 ring-[var(--arena-gold)] relative' : ''}`}>
+    <div className={`vapor-card p-6 ${isVaporProject ? 'ring-2 ring-[var(--arena-gold)] relative' : ''} ${!marketOnChain && !compact ? 'opacity-60 hover:opacity-80' : ''} transition-opacity`}>
       {/* Vapor Badge */}
       {!compact && isVaporProject && (
         <div 
@@ -358,25 +358,20 @@ export function MarketCard({ market, onUpdate, compact = false }: MarketCardProp
       {/* Deployment Status - Highlighted */}
       {marketOnChain !== null && (
         <div 
-          className={`mb-4 p-3 rounded-lg flex items-center justify-between ${
+          className={`mb-4 p-2.5 rounded-lg flex items-center justify-between text-xs ${
             marketOnChain 
               ? 'bg-[var(--arena-green)]/10 border border-[var(--arena-green)]/30' 
-              : 'bg-[var(--arena-gold)]/10 border border-[var(--arena-gold)]/30 cursor-pointer hover:bg-[var(--arena-gold)]/20'
+              : 'bg-[var(--arena-muted)]/10 border border-[var(--arena-border)] cursor-pointer hover:border-[var(--arena-gold)]'
           }`}
           onClick={() => !marketOnChain && setShowDeployModal(true)}
         >
           <div className="flex items-center gap-2">
-            <span className={`text-lg ${marketOnChain ? 'text-[var(--arena-green)]' : 'text-[var(--arena-gold)]'}`}>
-              {marketOnChain ? '✓' : '○'}
-            </span>
-            <span className={`text-sm font-medium ${marketOnChain ? 'text-[var(--arena-green)]' : 'text-[var(--arena-gold)]'}`}>
-              {marketOnChain ? 'Deployed On-Chain' : 'Not Deployed Yet'}
+            <span className={marketOnChain ? 'text-[var(--arena-green)]' : 'text-[var(--arena-muted)]'}>
+              {marketOnChain ? '✓ On-Chain' : '○ Not Deployed'}
             </span>
           </div>
           {!marketOnChain && (
-            <button className="text-xs px-3 py-1 rounded bg-[var(--arena-gold)] text-black font-medium hover:opacity-90">
-              Deploy Now
-            </button>
+            <span className="text-[var(--arena-gold)] font-medium">Deploy →</span>
           )}
         </div>
       )}
