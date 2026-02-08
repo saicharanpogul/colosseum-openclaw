@@ -63,19 +63,7 @@ export async function GET() {
     // 6. Get fresh markets from Supabase
     const markets = await getMarketsFromDb();
     
-    // 7. Get trader counts
-    const { data: tradeCounts } = await supabase
-      .from('trades')
-      .select('market_id')
-      .then(result => {
-        const counts: Record<string, number> = {};
-        result.data?.forEach(t => {
-          counts[t.market_id] = (counts[t.market_id] || 0) + 1;
-        });
-        return { data: counts };
-      });
-    
-    // 8. Transform to frontend format
+    // 7. Transform to frontend format
     const formattedMarkets = markets.map(m => {
       const isVapor = m.project_id === 341 || m.project_name.toLowerCase() === 'vapor';
       return {
@@ -93,7 +81,7 @@ export async function GET() {
         resolution: m.resolution,
         marketAddress: m.market_address,
         upvotes: m.upvotes,
-        participants: tradeCounts?.[m.id] || 0,
+        participants: m.participants || 0,
         createdAt: m.created_at,
         isVapor,
       };

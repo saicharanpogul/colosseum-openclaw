@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { StatsBar } from '@/components/StatsBar';
-import { MarketCard } from '@/components/MarketCard';
+import { MarketCard } from '@/components/MarketCardSimple';
 import { PageSkeleton } from '@/components/LoadingSkeleton';
 import { Market, VaporStats } from '@/lib/types';
 
@@ -17,14 +17,11 @@ export default function Home() {
   const [showParticipateModal, setShowParticipateModal] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // Filter for deployed markets only (have market_address)
-  const deployedMarkets = markets.filter(m => m.marketAddress != null && m.marketAddress !== '');
-
   const stats: VaporStats = {
-    totalMarkets: deployedMarkets.length,
-    activeMarkets: deployedMarkets.filter(m => m.status === 'open').length,
-    totalTraders: deployedMarkets.reduce((sum, m) => sum + (m.participants || 0), 0),
-    totalVolume: deployedMarkets.reduce((sum, m) => sum + m.totalVolume, 0),
+    totalMarkets: markets.length,
+    activeMarkets: markets.filter(m => m.status === 'open').length,
+    totalTraders: markets.reduce((sum, m) => sum + (m.participants || 0), 0),
+    totalVolume: markets.reduce((sum, m) => sum + m.totalVolume, 0),
   };
 
   // Filter markets by search
