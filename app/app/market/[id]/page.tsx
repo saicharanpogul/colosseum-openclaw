@@ -131,6 +131,11 @@ export default function MarketDetailPage() {
                   Resolved
                 </span>
               )}
+              {(!market.status || (market.status !== 'open' && market.status !== 'resolved')) && (
+                <span className="px-3 py-1 rounded-full bg-[var(--arena-muted)] bg-opacity-20 border border-[var(--arena-border)] text-[var(--arena-muted)] text-sm font-medium">
+                  Unknown
+                </span>
+              )}
             </div>
           </div>
 

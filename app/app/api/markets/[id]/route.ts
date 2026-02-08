@@ -39,7 +39,7 @@ export async function GET(
       totalVolume: market.total_volume,
       yesOdds: market.yes_odds,
       noOdds: market.no_odds,
-      status: market.status,
+      status: market.status || 'open', // Default to 'open' if null
       marketAddress: market.market_address,
       participants: participants || 0,
     }
@@ -174,7 +174,7 @@ export async function POST(
         totalVolume: updatedMarket?.total_volume,
         yesOdds: updatedMarket?.yes_odds,
         noOdds: updatedMarket?.no_odds,
-        status: updatedMarket?.status,
+        status: updatedMarket?.status || 'open', // Default to 'open' if null
         marketAddress: updatedMarket?.market_address,
         participants: participants || 0,
       }
