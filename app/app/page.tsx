@@ -6,6 +6,7 @@ import { Footer } from '@/components/Footer';
 import { StatsBar } from '@/components/StatsBar';
 import { MarketCard } from '@/components/MarketCardQuick';
 import { PageSkeleton } from '@/components/LoadingSkeleton';
+import { OnboardingModal } from '@/components/OnboardingModal';
 import { Market, VaporStats } from '@/lib/types';
 
 export default function Home() {
@@ -83,6 +84,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen arena-gradient">
+      <OnboardingModal />
       <Header />
       
       <main className="max-w-7xl mx-auto px-6 py-8">
@@ -95,8 +97,8 @@ export default function Home() {
               {markets.length} Markets Live
             </span>
             {/* Tooltip */}
-            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block z-10 w-64">
-              <div className="bg-[var(--arena-surface)] border border-[var(--arena-border)] rounded-lg p-3 text-xs text-[var(--arena-text)] shadow-lg">
+            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-64" style={{ zIndex: 9999 }}>
+              <div className="bg-[var(--arena-surface)] border border-[var(--arena-border)] rounded-lg p-3 text-xs text-[var(--arena-text)] shadow-xl">
                 <p className="text-[var(--arena-gold)] font-medium mb-1">Note:</p>
                 <p className="text-[var(--arena-muted)]">
                   Showing submitted projects only. The hackathon has 350+ total submissions including drafts.

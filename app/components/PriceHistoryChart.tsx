@@ -66,8 +66,12 @@ export function PriceHistoryChart({ marketId }: PriceHistoryChartProps) {
   if (loading && history.length === 0) {
     return (
       <div className="vapor-card p-6">
+        <h3 className="text-lg font-bold text-white mb-4">Price History</h3>
         <div className="flex items-center justify-center py-8">
-          <div className="spinner"></div>
+          <div className="text-center">
+            <div className="spinner mb-2"></div>
+            <p className="text-xs text-[var(--arena-muted)]">Loading price history...</p>
+          </div>
         </div>
       </div>
     );
@@ -76,7 +80,11 @@ export function PriceHistoryChart({ marketId }: PriceHistoryChartProps) {
   if (error) {
     return (
       <div className="vapor-card p-6">
-        <p className="text-sm text-[var(--arena-red)] text-center">{error}</p>
+        <h3 className="text-lg font-bold text-white mb-4">Price History</h3>
+        <div className="bg-[var(--arena-surface-alt)] rounded-lg p-6 text-center">
+          <p className="text-sm text-[var(--arena-muted)] mb-2">⚠️ Unable to load price history</p>
+          <p className="text-xs text-[var(--arena-text-dim)]">{error}</p>
+        </div>
       </div>
     );
   }
@@ -85,9 +93,15 @@ export function PriceHistoryChart({ marketId }: PriceHistoryChartProps) {
     return (
       <div className="vapor-card p-6">
         <h3 className="text-lg font-bold text-white mb-4">Price History</h3>
-        <p className="text-sm text-[var(--arena-muted)] text-center py-8">
-          No price history available yet. Check back soon!
-        </p>
+        <div className="bg-[var(--arena-surface-alt)] rounded-lg p-6 text-center">
+          <div className="text-4xl mb-3">📊</div>
+          <p className="text-sm text-[var(--arena-muted)] mb-2">
+            No price history available yet
+          </p>
+          <p className="text-xs text-[var(--arena-text-dim)]">
+            Price data is recorded every 5 minutes. Check back soon after the first trade!
+          </p>
+        </div>
       </div>
     );
   }
