@@ -3,11 +3,10 @@ import { supabase } from '@/lib/supabase';
 
 export async function POST() {
   try {
-    // Fetch all markets
+    // Fetch all markets (remove limit to get all)
     const { data: markets, error: fetchError } = await supabase
       .from('markets')
-      .select('*')
-      .limit(10);
+      .select('*');
 
     if (fetchError) {
       return NextResponse.json({ success: false, error: fetchError.message }, { status: 500 });
@@ -18,9 +17,9 @@ export async function POST() {
     }
 
     const now = new Date();
-    const hoursToGenerate = 24;
+    const daysToGenerate = 7; // 1 week of historical data
     const pointsPerHour = 12; // Every 5 minutes
-    const totalPoints = hoursToGenerate * pointsPerHour;
+    const totalPoints = daysToGenerate * 24 * pointsPerHour;
 
     const allSnapshots = [];
 
@@ -31,8 +30,8 @@ export async function POST() {
       for (let i = totalPoints; i > 0; i--) {
         const timestamp = new Date(now.getTime() - (i * 5 * 60 * 1000));
         
-        // Add realistic random movement (-2% to +2%)
-        const change = (Math.random() - 0.5) * 4;
+        // Add realistic random movement (-1.5% to +1.5%)
+        const change = (Math.random() - 0.5) * 3;
         currentYesOdds = Math.max(5, Math.min(95, currentYesOdds + change));
         currentNoOdds = 100 - currentYesOdds;
         
@@ -69,7 +68,7 @@ export async function POST() {
 
     return NextResponse.json({
       success: true,
-      message: `Generated ${inserted} price snapshots for ${markets.length} markets`,
+      message: `Generated ${inserted} price snapshots for ${markets.length} markets (7 days of data)`,
       marketsProcessed: markets.length,
       snapshotsCreated: inserted,
     });
