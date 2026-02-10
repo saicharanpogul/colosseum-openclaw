@@ -1,36 +1,57 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const { marketAddress, participants } = await request.json();
+    // Get all markets
+    const { data: markets, error: marketsError } = await supabase
+      .from('markets')
+      .select('id');
 
-    if (!marketAddress || participants === undefined) {
+    if (marketsError) {
       return NextResponse.json(
-        { error: "marketAddress and participants required" },
-        { status: 400 }
+        { success: false, error: marketsError.message },
+        { status: 500 }
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    const { data, error } = await supabase
-      .from("markets")
-      .update({ participants })
-      .eq("market_address", marketAddress)
-      .select();
-
-    if (error) {
-      console.error("Supabase error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!markets || markets.length === 0) {
+      return NextResponse.json({ success: false, error: 'No markets found' }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, data });
+    let updated = 0;
+
+    for (const market of markets) {
+      // Get all trades for this market
+      const { data: trades } = await supabase
+        .from('trades')
+        .select('user_address')
+        .eq('market_id', market.id);
+
+      if (trades && trades.length > 0) {
+        // Count unique traders
+        const uniqueTraders = new Set(trades.map(t => t.user_address)).size;
+
+        // Update market participants
+        await supabase
+          .from('markets')
+          .update({ participants: uniqueTraders })
+          .eq('id', market.id);
+
+        updated++;
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `Updated participants count for ${updated} markets`,
+      marketsProcessed: markets.length,
+      marketsUpdated: updated,
+    });
   } catch (error: any) {
-    console.error("Update participants error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
   }
 }

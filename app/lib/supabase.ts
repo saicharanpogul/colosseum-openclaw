@@ -124,6 +124,7 @@ export async function recordTrade(trade: {
   shares: number;
   txSignature: string;
 }): Promise<void> {
+  // Insert trade
   const { error } = await supabase
     .from('trades')
     .insert({
@@ -136,7 +137,25 @@ export async function recordTrade(trade: {
       tx_signature: trade.txSignature,
     });
 
-  if (error) console.error('Failed to record trade:', error);
+  if (error) {
+    console.error('Failed to record trade:', error);
+    return;
+  }
+
+  // Update participants count: count unique traders for this market
+  const { data: trades } = await supabase
+    .from('trades')
+    .select('user_address')
+    .eq('market_id', trade.marketId);
+
+  if (trades) {
+    const uniqueTraders = new Set(trades.map(t => t.user_address)).size;
+    
+    await supabase
+      .from('markets')
+      .update({ participants: uniqueTraders })
+      .eq('id', trade.marketId);
+  }
 }
 
 // Update position
