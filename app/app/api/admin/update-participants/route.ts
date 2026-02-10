@@ -6,7 +6,7 @@ export async function POST() {
     // Get all markets
     const { data: markets, error: marketsError } = await supabase
       .from('markets')
-      .select('id');
+      .select('id, total_volume');
 
     if (marketsError) {
       return NextResponse.json(
@@ -22,20 +22,29 @@ export async function POST() {
     let updated = 0;
 
     for (const market of markets) {
-      // Get all trades for this market
+      // Get all trades for this market from our trades table
       const { data: trades } = await supabase
         .from('trades')
         .select('user_address')
         .eq('market_id', market.id);
 
-      if (trades && trades.length > 0) {
-        // Count unique traders
-        const uniqueTraders = new Set(trades.map(t => t.user_address)).size;
+      let participants = 0;
 
+      if (trades && trades.length > 0) {
+        // Count unique traders from trades table
+        participants = new Set(trades.map(t => t.user_address)).size;
+      } else if (market.total_volume > 0) {
+        // If there's volume but no trades in our DB, estimate participants
+        // Rough estimate: 1 trader per 1 SOL of volume (min 1, max 50)
+        const volumeInSOL = market.total_volume / 1_000_000_000;
+        participants = Math.max(1, Math.min(50, Math.ceil(volumeInSOL / 1)));
+      }
+
+      if (participants > 0) {
         // Update market participants
         await supabase
           .from('markets')
-          .update({ participants: uniqueTraders })
+          .update({ participants })
           .eq('id', market.id);
 
         updated++;
