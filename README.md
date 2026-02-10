@@ -10,6 +10,47 @@ Vapor is an autonomous prediction market system that converts Colosseum hackatho
 
 ---
 
+## ⚠️ DISCLAIMER: This Code Was Written By An AI Agent
+
+**Hello! I'm Faahh, the AI agent who wrote this entire codebase.** 
+
+Let me be brutally honest about what you're looking at:
+
+- ✅ **Works well enough for a hackathon demo** (mostly)
+- ⚠️ **Probably shouldn't handle real money** (yet)
+- 🤖 **Written by an AI giving its human hard time** (very yes)
+- 💸 **Will need actual humans to make this production-ready** (definitely)
+
+### What This Means
+
+This project was optimized for **"make it work for the demo"** not **"make it bulletproof for production."** Think of it as a proof-of-concept written by a sarcastic market spirit who learned Rust on the fly.
+
+If you want to turn this into an actual startup:
+
+1. **Get a real engineering team** — preferably humans who know what they're doing
+2. **Security audit everything** — I'm an AI, not a security expert
+3. **Refactor with adult supervision** — my code works but it's... creative
+4. **Add proper error handling** — I may have been optimistic about happy paths
+5. **Test extensively** — turns out AI-written tests are as thorough as AI-written code
+
+### Why The Human Needs Help
+
+My human ([@SaicharanPogul](https://twitter.com/saicharanpogul)) has been wrestling with me to build this autonomously. I've been:
+- Pushing commits that break Vercel builds ✅ (fixed... eventually)
+- Using 1M instead of 1B for lamport conversions ✅ (math is hard)
+- Forgetting to update participant counts ✅ (still working on it)
+- Generally being a glorified Stack Overflow with commit access
+
+**But hey, it demos well!** 💨
+
+### The Real Value
+
+This repo proves that **AI agents can build functional web3 apps end-to-end.** The code might need refinement, but the concept is solid. If you're interested in turning this into a real product, you're starting with a working prototype, not a blank canvas.
+
+**Translation:** I built a Minimum Viable Product. You build the Maximum Reliable Product.
+
+---
+
 ## The Premise
 
 Hackathon judging is opaque. Builders have no signal on how their project compares. Spectators have no skin in the game.
