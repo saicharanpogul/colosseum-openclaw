@@ -20,28 +20,42 @@ export async function POST() {
     }
 
     let updated = 0;
+    let fromPositions = 0;
+    let fromTrades = 0;
+    let estimated = 0;
 
     for (const market of markets) {
-      // Get all trades for this market from our trades table
-      const { data: trades } = await supabase
-        .from('trades')
-        .select('user_address')
-        .eq('market_id', market.id);
-
       let participants = 0;
 
-      if (trades && trades.length > 0) {
-        // Count unique traders from trades table
-        participants = new Set(trades.map(t => t.user_address)).size;
-      } else if (market.total_volume > 0) {
-        // If there's volume but no trades in our DB, estimate participants
-        // Rough estimate: 1 trader per 1 SOL of volume (min 1, max 50)
-        const volumeInSOL = market.total_volume / 1_000_000_000;
-        participants = Math.max(1, Math.min(50, Math.ceil(volumeInSOL / 1)));
+      // 1. Try positions table first (most accurate - shows who currently has shares)
+      const { data: positions } = await supabase
+        .from('positions')
+        .select('user_address')
+        .eq('market_id', market.id)
+        .gt('shares', 0); // Only count positions with actual shares
+
+      if (positions && positions.length > 0) {
+        participants = new Set(positions.map(p => p.user_address)).size;
+        fromPositions++;
+      } else {
+        // 2. Fall back to trades table
+        const { data: trades } = await supabase
+          .from('trades')
+          .select('user_address')
+          .eq('market_id', market.id);
+
+        if (trades && trades.length > 0) {
+          participants = new Set(trades.map(t => t.user_address)).size;
+          fromTrades++;
+        } else if (market.total_volume > 0) {
+          // 3. Last resort: estimate from volume
+          const volumeInSOL = market.total_volume / 1_000_000_000;
+          participants = Math.max(1, Math.min(50, Math.ceil(volumeInSOL / 1)));
+          estimated++;
+        }
       }
 
       if (participants > 0) {
-        // Update market participants
         await supabase
           .from('markets')
           .update({ participants })
@@ -56,6 +70,11 @@ export async function POST() {
       message: `Updated participants count for ${updated} markets`,
       marketsProcessed: markets.length,
       marketsUpdated: updated,
+      breakdown: {
+        fromPositions,
+        fromTrades,
+        estimated,
+      }
     });
   } catch (error: any) {
     return NextResponse.json(
