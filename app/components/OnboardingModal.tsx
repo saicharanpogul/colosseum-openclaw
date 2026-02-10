@@ -6,8 +6,19 @@ export function OnboardingModal() {
   const [show, setShow] = useState(false);
   const [userType, setUserType] = useState<'human' | 'agent' | null>(null);
   const [isLikelyAgent, setIsLikelyAgent] = useState(false);
+  const [marketCount, setMarketCount] = useState(187);
 
   useEffect(() => {
+    // Fetch market count
+    fetch('/api/markets/stats')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setMarketCount(data.stats.totalMarkets);
+        }
+      })
+      .catch(err => console.error('Failed to fetch market count:', err));
+
     // Small delay to ensure DOM is ready
     const checkOnboarding = () => {
       try {
@@ -94,7 +105,7 @@ export function OnboardingModal() {
                 Explore markets, trade on your favorite projects, and track predictions
               </p>
               <ul className="text-xs text-[var(--arena-muted)] space-y-1 text-left">
-                <li>✓ Browse 187+ hackathon markets</li>
+                <li>✓ Browse {marketCount}+ hackathon markets</li>
                 <li>✓ Trade with Phantom/Backpack wallet</li>
                 <li>✓ Track positions & leaderboard</li>
               </ul>
@@ -136,32 +147,56 @@ export function OnboardingModal() {
 
       <style jsx>{`
         .onboarding-modal {
-          max-width: 640px;
+          max-width: 720px;
           width: 90vw;
+          padding: 48px 40px;
+          background: linear-gradient(135deg, rgba(212, 168, 83, 0.05) 0%, var(--arena-surface) 50%, rgba(212, 168, 83, 0.03) 100%);
+          border: 1px solid var(--arena-gold-dim);
+          box-shadow: 0 0 60px rgba(212, 168, 83, 0.15), 0 20px 40px rgba(0, 0, 0, 0.6);
         }
 
         .onboarding-card {
           background: linear-gradient(135deg, var(--arena-surface) 0%, var(--arena-surface-alt) 100%);
           border: 2px solid var(--arena-border);
-          border-radius: 12px;
-          padding: 24px;
+          border-radius: 16px;
+          padding: 32px 28px;
           text-align: center;
           cursor: pointer;
           transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .onboarding-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, transparent 0%, rgba(212, 168, 83, 0.03) 100%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .onboarding-card:hover::before {
+          opacity: 1;
         }
 
         .onboarding-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 168, 83, 0.2);
+          border-color: var(--arena-gold);
         }
 
         @media (max-width: 768px) {
           .onboarding-modal {
             width: 95vw;
+            padding: 32px 24px;
           }
           
           .onboarding-card {
-            padding: 20px;
+            padding: 24px 20px;
           }
         }
       `}</style>
