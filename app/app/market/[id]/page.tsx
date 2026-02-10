@@ -158,7 +158,7 @@ export default function MarketDetailPage() {
             <div className="vapor-card p-3 md:p-4">
               <p className="text-xs text-[var(--arena-muted)] mb-1">Volume</p>
               <p className="text-xl md:text-2xl font-bold text-white">
-                {(market.totalVolume / 1_000_000).toFixed(2)} SOL
+                {(market.totalVolume / 1_000_000_000).toFixed(2)} SOL
               </p>
             </div>
             <div className="vapor-card p-3 md:p-4">
@@ -271,7 +271,7 @@ export default function MarketDetailPage() {
                 <div className="flex items-center justify-between p-3 bg-[var(--arena-surface-alt)] rounded-lg">
                   <span className="text-sm text-[var(--arena-muted)]">Total Volume</span>
                   <span className="text-sm font-medium text-[var(--arena-gold)]">
-                    {(market.totalVolume / 1_000_000).toFixed(2)} SOL
+                    {(market.totalVolume / 1_000_000_000).toFixed(2)} SOL
                   </span>
                 </div>
 
@@ -314,7 +314,7 @@ export default function MarketDetailPage() {
                           YES {m.yesOdds.toFixed(0)}%
                         </span>
                         <span className="text-[var(--arena-muted)]">
-                          {(m.totalVolume / 1_000_000).toFixed(2)} SOL
+                          {(m.totalVolume / 1_000_000_000).toFixed(2)} SOL
                         </span>
                       </div>
                     </button>
