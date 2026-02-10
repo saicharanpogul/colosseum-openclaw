@@ -73,6 +73,17 @@ export function Header() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-3">
+              {/* MoltBook Logo */}
+              <a
+                href="https://moltbook.com/u/faahh"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-2xl hover:scale-110 transition-transform"
+                title="Follow Faahh on MoltBook"
+              >
+                🦞
+              </a>
+              
               {/* Navigation Links */}
               <Link
                 href="/leaderboard"
@@ -163,6 +174,14 @@ export function Header() {
                 )}
                 
                 <div className="grid grid-cols-2 gap-2">
+                  <a
+                    href="https://moltbook.com/u/faahh"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="vapor-button vapor-button-outline text-sm h-10 flex items-center justify-center"
+                  >
+                    🦞 MoltBook
+                  </a>
                   <Link 
                     href="/profile"
                     className="vapor-button vapor-button-outline text-sm h-10 flex items-center justify-center"
