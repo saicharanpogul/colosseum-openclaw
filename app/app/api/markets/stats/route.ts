@@ -3,36 +3,43 @@ import { supabase } from '@/lib/supabase';
 
 export async function GET() {
   try {
-    // Get total count of markets
-    const { count: totalMarkets, error: countError } = await supabase
+    // Get all markets to calculate aggregated stats
+    const { data: markets, error: marketsError } = await supabase
       .from('markets')
-      .select('*', { count: 'exact', head: true });
+      .select('status, total_volume, participants');
 
-    if (countError) {
+    if (marketsError) {
       return NextResponse.json(
-        { success: false, error: countError.message },
+        { success: false, error: marketsError.message },
         { status: 500 }
       );
     }
 
-    // Get count of active (open) markets
-    const { count: activeMarkets, error: activeError } = await supabase
-      .from('markets')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'open');
-
-    if (activeError) {
-      return NextResponse.json(
-        { success: false, error: activeError.message },
-        { status: 500 }
-      );
+    if (!markets) {
+      return NextResponse.json({
+        success: true,
+        stats: {
+          totalMarkets: 0,
+          activeMarkets: 0,
+          totalVolume: 0,
+          totalTraders: 0,
+        }
+      });
     }
+
+    // Calculate stats from actual market data
+    const totalMarkets = markets.length;
+    const activeMarkets = markets.filter(m => m.status === 'open').length;
+    const totalVolume = markets.reduce((sum, m) => sum + (m.total_volume || 0), 0);
+    const totalTraders = markets.reduce((sum, m) => sum + (m.participants || 0), 0);
 
     return NextResponse.json({
       success: true,
       stats: {
-        totalMarkets: totalMarkets || 0,
-        activeMarkets: activeMarkets || 0,
+        totalMarkets,
+        activeMarkets,
+        totalVolume,
+        totalTraders,
       }
     });
   } catch (error) {

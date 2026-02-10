@@ -17,15 +17,12 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showParticipateModal, setShowParticipateModal] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [totalMarkets, setTotalMarkets] = useState(0);
-  const [activeMarkets, setActiveMarkets] = useState(0);
-
-  const stats: VaporStats = {
-    totalMarkets: markets.length,
-    activeMarkets: markets.filter(m => m.status === 'open').length,
-    totalTraders: markets.reduce((sum, m) => sum + (m.participants || 0), 0),
-    totalVolume: markets.reduce((sum, m) => sum + m.totalVolume, 0),
-  };
+  const [stats, setStats] = useState<VaporStats>({
+    totalMarkets: 0,
+    activeMarkets: 0,
+    totalVolume: 0,
+    totalTraders: 0,
+  });
 
   // Filter markets by search
   const filteredMarkets = useMemo(() => {
@@ -60,8 +57,12 @@ export default function Home() {
       const res = await fetch('/api/markets/stats');
       const data = await res.json();
       if (data.success) {
-        setTotalMarkets(data.stats.totalMarkets);
-        setActiveMarkets(data.stats.activeMarkets);
+        setStats({
+          totalMarkets: data.stats.totalMarkets,
+          activeMarkets: data.stats.activeMarkets,
+          totalVolume: data.stats.totalVolume,
+          totalTraders: data.stats.totalTraders,
+        });
       }
     } catch (err) {
       console.error('Failed to fetch market stats:', err);
@@ -113,7 +114,7 @@ export default function Home() {
             <span className="text-sm text-[var(--arena-gold)]">🏛️ Agent Hackathon</span>
             <span className="text-[var(--arena-muted)]">•</span>
             <span className="text-sm text-[var(--arena-muted)]">
-              {totalMarkets || markets.length} Markets Live
+              {stats.totalMarkets || markets.length} Markets Live
             </span>
           </div>
           
