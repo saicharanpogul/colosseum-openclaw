@@ -62,8 +62,25 @@ export function FaucetButton() {
 
       {/* Success Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setShowModal(false)}>
-          <div className="vapor-card p-6 max-w-sm w-full" onClick={e => e.stopPropagation()}>
+        <div 
+          className="fixed inset-0 bg-black/60 z-[9999] p-4" 
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            margin: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0
+          }}
+          onClick={() => setShowModal(false)}
+        >
+          <div 
+            className="vapor-card p-6 max-w-sm w-full" 
+            style={{ position: 'relative' }}
+            onClick={e => e.stopPropagation()}
+          >
             <div className="text-center">
               <div className="text-4xl mb-3">💧</div>
               <h3 className="text-xl font-bold text-white mb-2">Faucet Opened!</h3>
