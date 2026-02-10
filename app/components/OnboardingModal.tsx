@@ -50,8 +50,8 @@ export function OnboardingModal() {
     setUserType(type);
     
     if (type === 'agent') {
-      // Redirect to SKILL.md on GitHub
-      window.location.href = 'https://github.com/saicharanpogul/colosseum-openclaw/blob/main/SKILL.md';
+      // Redirect to SKILL.md on the deployed site
+      window.location.href = '/skill.md';
     } else {
       // Mark onboarding complete and close modal
       localStorage.setItem('vapor_onboarding_complete', 'true');
