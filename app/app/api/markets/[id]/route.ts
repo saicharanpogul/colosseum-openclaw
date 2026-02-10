@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, recordTrade, updateMarketFromChain } from '@/lib/supabase';
-import { getMarketAccount } from '@/lib/vapor-client';
+import { getMarketAccount, connection } from '@/lib/vapor-client';
 
 export async function GET(
   request: NextRequest,
@@ -109,6 +109,13 @@ export async function POST(
       );
     }
     
+    if (!txSignature || !userAddress) {
+      return NextResponse.json(
+        { success: false, error: 'Missing txSignature or userAddress' },
+        { status: 400 }
+      );
+    }
+    
     // Get market
     const { data: market, error: marketError } = await supabase
       .from('markets')
@@ -123,18 +130,82 @@ export async function POST(
       );
     }
     
-    // Record trade if txSignature provided
-    if (txSignature && userAddress) {
-      await recordTrade({
-        marketId: id,
-        userAddress,
-        side,
-        action: action || 'buy',
-        amount,
-        shares: shares || amount,
-        txSignature,
-      });
+    // Check for replay attack - signature already used
+    const { data: existingTrade } = await supabase
+      .from('trades')
+      .select('id')
+      .eq('tx_signature', txSignature)
+      .single();
+    
+    if (existingTrade) {
+      return NextResponse.json(
+        { success: false, error: 'Transaction already processed' },
+        { status: 409 }
+      );
     }
+    
+    // Verify transaction on-chain
+    try {
+      const tx = await connection.getTransaction(txSignature, {
+        maxSupportedTransactionVersion: 0,
+        commitment: 'confirmed',
+      });
+      
+      if (!tx) {
+        return NextResponse.json(
+          { success: false, error: 'Transaction not found on-chain' },
+          { status: 404 }
+        );
+      }
+      
+      if (tx.meta?.err) {
+        return NextResponse.json(
+          { success: false, error: 'Transaction failed on-chain' },
+          { status: 400 }
+        );
+      }
+      
+      // Verify signer matches userAddress
+      const signerPubkey = tx.transaction.message.staticAccountKeys[0]?.toString();
+      if (signerPubkey !== userAddress) {
+        return NextResponse.json(
+          { success: false, error: 'Transaction signer does not match userAddress' },
+          { status: 403 }
+        );
+      }
+    } catch (verifyError) {
+      console.error('Signature verification error:', verifyError);
+      return NextResponse.json(
+        { success: false, error: 'Failed to verify transaction' },
+        { status: 500 }
+      );
+    }
+    
+    // Rate limiting - check trades from this wallet in last minute
+    const oneMinuteAgo = new Date(Date.now() - 60000).toISOString();
+    const { count: recentTrades } = await supabase
+      .from('trades')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_address', userAddress)
+      .gte('created_at', oneMinuteAgo);
+    
+    if (recentTrades && recentTrades >= 10) {
+      return NextResponse.json(
+        { success: false, error: 'Rate limit exceeded. Max 10 trades per minute.' },
+        { status: 429 }
+      );
+    }
+    
+    // Record trade
+    await recordTrade({
+      marketId: id,
+      userAddress,
+      side,
+      action: action || 'buy',
+      amount,
+      shares: shares || amount,
+      txSignature,
+    });
     
     // Fetch fresh on-chain data
     const projectId = market.project_id;
