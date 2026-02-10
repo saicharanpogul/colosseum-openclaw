@@ -3,17 +3,18 @@ import { supabase } from '@/lib/supabase';
 
 export async function POST() {
   try {
-    // Fetch all markets (remove limit to get all)
+    // Fetch only deployed markets (those with market_address)
     const { data: markets, error: fetchError } = await supabase
       .from('markets')
-      .select('*');
+      .select('*')
+      .not('market_address', 'is', null);
 
     if (fetchError) {
       return NextResponse.json({ success: false, error: fetchError.message }, { status: 500 });
     }
 
     if (!markets || markets.length === 0) {
-      return NextResponse.json({ success: false, error: 'No markets found' }, { status: 404 });
+      return NextResponse.json({ success: false, error: 'No deployed markets found' }, { status: 404 });
     }
 
     const now = new Date();
