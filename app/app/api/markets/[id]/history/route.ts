@@ -34,10 +34,26 @@ export async function GET(
   }
   
   try {
+    // Resolve slug to market_id if needed
+    let marketId = id;
+    
+    if (!id.includes('-market-')) {
+      // Looks like a slug, resolve to ID
+      const { data: market } = await supabase
+        .from('markets')
+        .select('id')
+        .eq('project_slug', id)
+        .single();
+      
+      if (market) {
+        marketId = market.id;
+      }
+    }
+    
     const { data, error } = await supabase
       .from('price_history')
       .select('*')
-      .eq('market_id', id)
+      .eq('market_id', marketId)
       .gte('recorded_at', startTime.toISOString())
       .order('recorded_at', { ascending: true });
     

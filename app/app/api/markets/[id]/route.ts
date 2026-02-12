@@ -8,11 +8,19 @@ export async function GET(
 ) {
   const { id } = await params;
   
-  const { data: market, error } = await supabase
+  // Try to find by ID first, then by project_slug
+  let query = supabase
     .from('markets')
-    .select('*')
-    .eq('id', id)
-    .single();
+    .select('*');
+  
+  // Check if it looks like a slug (no "market" prefix)
+  if (!id.includes('-market-')) {
+    query = query.eq('project_slug', id);
+  } else {
+    query = query.eq('id', id);
+  }
+  
+  const { data: market, error } = await query.single();
   
   if (error || !market) {
     return NextResponse.json(
@@ -25,7 +33,7 @@ export async function GET(
   const { count: participants } = await supabase
     .from('trades')
     .select('*', { count: 'exact', head: true })
-    .eq('market_id', id);
+    .eq('market_id', market.id);
   
   return NextResponse.json({ 
     success: true, 
